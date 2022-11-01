@@ -42,42 +42,38 @@ class _CalendarState extends State<Calendar> {
       color: Colors.white,
       height: 45,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          /*
-          GestureDetector(
-            child: const Icon(
-              Icons.arrow_left,
-              size: 30,
-              color: Colors.black,
-            ),
-            onTap: () {
-              _monthDuration--;
-              setState(() {});
-            },
+          OutlinedButton(
+            onPressed: () {},
+            child: (selectedDate == _now) ? const Text('今日') : const Text(''),
           ),
-          */
-          Text(
-            DateFormat('yyyy年M月').format(
-              DateTime(_now.year, _now.month + _monthDuration, 1),
-            ),
-            style: const TextStyle(
-              fontSize: 20.0,
-              color: Colors.black,
-            ),
+          Row(
+            children: [
+              Text(
+                DateFormat('yyyy年M月').format(
+                  DateTime(_now.year, _now.month + _monthDuration, 1),
+                ),
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.black,
+                ),
+              ),
+              GestureDetector(
+                child: const Icon(
+                  Icons.arrow_drop_down,
+                  size: 30,
+                  color: Colors.black,
+                ),
+                onTap: () {
+                  setState(() {
+                    selectDate(context: context, locale: 'ja');
+                  });
+                },
+              ),
+            ],
           ),
-          GestureDetector(
-            child: const Icon(
-              Icons.arrow_drop_down,
-              size: 30,
-              color: Colors.black,
-            ),
-            onTap: () {
-              setState(() {
-                selectDate(context: context, locale: 'ja');
-              });
-            },
-          ),
+          const SizedBox(),
         ],
       ),
     );
@@ -141,21 +137,13 @@ class _CalendarState extends State<Calendar> {
             listCache.insert(
               0,
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: buildBorder(),
-                  ),
-                ),
+                child: Container(),
               ),
             );
           } else {
             listCache.add(
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: buildBorder(),
-                  ),
-                ),
+                child: Container(),
               ),
             );
           }
@@ -175,9 +163,6 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Border buildBorder() =>
-      Border.all(color: widget.color ?? Theme.of(context).primaryColor);
-
   int newLineNumber({required int startNumber}) {
     if (startNumber == 1) return 7;
     return startNumber - 1;
@@ -189,11 +174,6 @@ class _CalendarState extends State<Calendar> {
     if (isToday) {
       return Container(
         alignment: Alignment.topCenter,
-        /*
-        decoration: BoxDecoration(
-          border: buildBorder(),
-        ),
-        */
         child: Container(
           margin: const EdgeInsets.all(3),
           alignment: Alignment.center,
@@ -242,18 +222,15 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  //
-  static Color dateColor(DateTime date) {
-    switch (date.weekday) {
-      case DateTime.sunday:
-        return Colors.red;
-
-      case DateTime.saturday:
-        return Colors.blue;
-
-      default:
-        return Colors.black;
+  Color dateColor(DateTime day) {
+    const defaultDateColor = Colors.black87;
+    if (day.weekday == DateTime.sunday) {
+      return Colors.red;
     }
+    if (day.weekday == DateTime.saturday) {
+      return Colors.blue[600]!;
+    }
+    return defaultDateColor;
   }
 
   selectDate({required BuildContext context, String? locale}) async {

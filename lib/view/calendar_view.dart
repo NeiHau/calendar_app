@@ -9,6 +9,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  DateTime now = DateTime.now();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,10 +25,31 @@ class _CalendarPageState extends State<CalendarPage> {
               itemBuilder: (context, index) {
                 return const Calendar(weekDay: 1); // 何曜日からはじまるか（月曜日は1,日曜日は7),
               },
+              onPageChanged: (value) {
+                getNextMonth();
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  getNextMonth() {
+    if (now.month == 12) {
+      now = DateTime(now.year + 1, 1);
+    } else {
+      now = DateTime(now.year, now.month + 1);
+    }
+    return now;
+  }
+
+  getPrevMonth() {
+    if (now.month == 1) {
+      now = DateTime(now.year - 1, 12);
+    } else {
+      now = DateTime(now.year, now.month - 1);
+    }
+    return now;
   }
 }
