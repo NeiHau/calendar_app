@@ -45,8 +45,10 @@ class _CalendarState extends State<Calendar> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           OutlinedButton(
-            onPressed: () {},
-            child: (selectedDate == _now) ? const Text('今日') : const Text(''),
+            onPressed: () {
+              selectedDate = _now; // '今日'と書かれたボタンを押すと、今日の日付に移行。
+            },
+            child: const Text('今日'),
           ),
           Row(
             children: [
