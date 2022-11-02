@@ -82,7 +82,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      DateFormat('yyyy年M月D日').format(
+                      DateFormat('yyyy/MM/dd (EEE)', 'ja').format(
                         DateTime(now.year, now.month, now.day),
                       ),
                     ),
@@ -92,7 +92,7 @@ class _CalendarPageState extends State<CalendarPage> {
                           context,
                           MaterialPageRoute(
                             // （2） 実際に表示するページ(ウィジェット)を指定する
-                            builder: (context) => const EventAddingPage(),
+                            builder: (context) => EventAddingPage(),
                           ),
                         );
                       },
@@ -106,7 +106,7 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               content: const SizedBox(
                 height: 360,
-                width: 350,
+                width: 400,
                 child: Center(
                   child: Text('予定がありません。'),
                 ),

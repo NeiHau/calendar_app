@@ -46,7 +46,7 @@ class _CalendarState extends State<Calendar> {
         children: <Widget>[
           OutlinedButton(
             onPressed: () {
-              selectedDate = _now; // '今日'と書かれたボタンを押すと、今日の日付に移行。
+              selectedDate = _now; // '今日'と書かれたボタンを押すと、今日の日付に移行させたい。
             },
             child: const Text('今日'),
           ),

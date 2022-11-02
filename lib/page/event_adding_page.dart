@@ -2,7 +2,7 @@ import 'package:first_app/model/event.dart';
 import 'package:flutter/material.dart';
 
 class EventAddingPage extends StatefulWidget {
-  const EventAddingPage({super.key, this.event});
+  EventAddingPage({super.key, this.event});
 
   final Event? event;
 
@@ -15,6 +15,7 @@ class _EventAddingPageState extends State<EventAddingPage> {
   final titleController = TextEditingController();
   late DateTime fromDate;
   late DateTime toDate;
+  late FocusNode addTaskFocusNode;
 
   @override
   void initState() {
@@ -29,8 +30,11 @@ class _EventAddingPageState extends State<EventAddingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        title: const Center(child: Text('予定の追加')),
+        title: const Center(
+          child: Text('予定の追加'),
+        ),
         leading: const CloseButton(),
         actions: buildEditingActions(),
       ),
@@ -42,6 +46,7 @@ class _EventAddingPageState extends State<EventAddingPage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               buildTitle(),
+              buildTitle2(),
             ],
           ),
         ),
@@ -62,12 +67,55 @@ class _EventAddingPageState extends State<EventAddingPage> {
         )
       ];
 
-  Widget buildTitle() => TextFormField(
-        style: const TextStyle(fontSize: 12),
-        decoration: const InputDecoration(
-          border: UnderlineInputBorder(),
-          hintText: 'タイトルを入力してください',
+  Widget buildTitle() => Card(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(0, 7, 5, 5),
+          child: TextFormField(
+            style: const TextStyle(fontSize: 12),
+            decoration: const InputDecoration(
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              border: UnderlineInputBorder(),
+              hintText: 'タイトルを入力してください',
+            ),
+            onFieldSubmitted: (_) {},
+          ),
         ),
-        onFieldSubmitted: (_) {},
+      );
+
+  Widget buildTitle2() => AlertDialog(
+        title: Container(
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.black12,
+                width: 1,
+              ),
+            ),
+          ),
+        ),
+        content: const SizedBox(
+          height: 360,
+          width: 350,
+          child: Center(
+            child: Text('予定がありません。'),
+          ),
+        ),
+      );
+
+  Widget buildDescription() => Card(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(0, 7, 5, 5),
+          child: TextFormField(
+            style: const TextStyle(fontSize: 12),
+            decoration: const InputDecoration(
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              border: UnderlineInputBorder(),
+              hintText: 'タイトルを入力してください',
+            ),
+            onFieldSubmitted: (_) {},
+          ),
+        ),
       );
 }
