@@ -1,17 +1,18 @@
 import 'package:first_app/page/event_adding_page.dart';
 import 'package:first_app/view/calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class CalendarPage extends StatefulWidget {
+class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
 
   @override
-  State<CalendarPage> createState() => _CalendarPageState();
+  ConsumerState<CalendarPage> createState() => _CalendarPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
-  DateTime now = DateTime.now();
+class _CalendarPageState extends ConsumerState<CalendarPage> {
+  //DateTime now = DateTime.now();
   String? newTask;
   @override
   Widget build(BuildContext context) {
@@ -25,16 +26,15 @@ class _CalendarPageState extends State<CalendarPage> {
           Expanded(
             child: PageView.builder(
               controller: PageController(initialPage: 1500),
+              onPageChanged: (value) {
+                getNextMonth();
+              },
               itemBuilder: (context, index) {
                 return GestureDetector(
                     onTap: () {
                       createTask();
                     },
-                    child:
-                        const Calendar(weekDay: 1)); // 何曜日からはじまるか（月曜日は1,日曜日は7),
-              },
-              onPageChanged: (value) {
-                getNextMonth();
+                    child: const Calendar()); // 何曜日からはじまるか（月曜日は1,日曜日は7),
               },
             ),
           ),
@@ -44,6 +44,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   getNextMonth() {
+    var now = ref.read(nowProvider.notifier).state;
     if (now.month == 12) {
       now = DateTime(now.year + 1, 1);
     } else {
@@ -53,6 +54,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   getPrevMonth() {
+    var now = ref.read(nowProvider.notifier).state;
     if (now.month == 1) {
       now = DateTime(now.year - 1, 12);
     } else {
@@ -62,6 +64,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void createTask() {
+    var now = ref.read(nowProvider.notifier).state;
     showDialog(
       context: context,
       builder: (BuildContext context) {

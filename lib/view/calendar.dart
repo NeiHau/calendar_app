@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
-class Calendar extends StatefulWidget {
-  final int weekDay;
+final weekDayProvider = StateProvider(((ref) => 7));
+final monthDurationProvider = StateProvider(((ref) => 0));
+final nowProvider = StateProvider(((ref) => DateTime.now()));
+
+class Calendar extends ConsumerStatefulWidget {
   final Color? color;
 
-  const Calendar({this.weekDay = 7, this.color, Key? key}) : super(key: key);
+  const Calendar({this.color, Key? key}) : super(key: key);
 
   @override
-  _CalendarState createState() => _CalendarState();
+  ConsumerState<Calendar> createState() => CalendarState();
 }
 
-class _CalendarState extends State<Calendar> {
+class CalendarState extends ConsumerState<Calendar> {
   final List<String> _weekName = ['月', '火', '水', '木', '金', '土', '日'];
   late DateTime selectedDate;
-  DateTime _now = DateTime.now();
-  final int _monthDuration = 0;
 
   @override
   void initState() {
+    var now = ref.read(nowProvider.notifier).state;
+    selectedDate = now;
     super.initState();
-    selectedDate = _now;
   }
 
   @override
@@ -29,15 +32,17 @@ class _CalendarState extends State<Calendar> {
     return Column(
       children: [
         currentMonth(),
-        dayOfWeek(),
+        dayOfWeek(ref),
         Expanded(
-          child: calendar(),
+          child: calendar(ref),
         ),
       ],
     );
   }
 
   Container currentMonth() {
+    var now = ref.read(nowProvider.notifier).state;
+    var monthDuration = ref.read(monthDurationProvider.notifier).state;
     return Container(
       color: Colors.white,
       height: 45,
@@ -46,7 +51,7 @@ class _CalendarState extends State<Calendar> {
         children: <Widget>[
           OutlinedButton(
             onPressed: () {
-              selectedDate = _now; // '今日'と書かれたボタンを押すと、今日の日付に移行させたい。
+              selectedDate = now; // '今日'と書かれたボタンを押すと、今日の日付に移行させたい。
             },
             child: const Text('今日'),
           ),
@@ -54,7 +59,7 @@ class _CalendarState extends State<Calendar> {
             children: [
               Text(
                 DateFormat('yyyy年M月').format(
-                  DateTime(_now.year, _now.month + _monthDuration, 1),
+                  DateTime(now.year, now.month + monthDuration, 1),
                 ),
                 style: const TextStyle(
                   fontSize: 20.0,
@@ -69,7 +74,7 @@ class _CalendarState extends State<Calendar> {
                 ),
                 onTap: () {
                   setState(() {
-                    selectDate(context: context, locale: 'ja');
+                    selectDate(context: context, locale: 'ja', ref: ref);
                   });
                 },
               ),
@@ -81,9 +86,10 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Widget dayOfWeek() {
+  Widget dayOfWeek(WidgetRef ref) {
+    var weekDay = ref.read(weekDayProvider.notifier).state;
     List<Widget> weekList = [];
-    int weekIndex = widget.weekDay - 1; //初期値-1
+    int weekIndex = weekDay; //初期値
     int counter = 0;
     while (counter < 7) {
       weekList.add(
@@ -109,11 +115,14 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  Widget calendar() {
+  Widget calendar(WidgetRef ref) {
+    var now = ref.read(nowProvider.notifier).state;
+    var monthDuration = ref.read(monthDurationProvider.notifier).state;
+    var weekDay = ref.read(weekDayProvider.notifier).state + 1;
     List<Widget> list = [];
 
     DateTime firstDayOfTheMonth =
-        DateTime(_now.year, _now.month + _monthDuration, 1);
+        DateTime(now.year, now.month + monthDuration, 1);
     int monthLastNumber =
         DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month + 1, 1)
             .add(const Duration(days: -1))
@@ -129,7 +138,7 @@ class _CalendarState extends State<Calendar> {
 
       if (DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)
                   .weekday ==
-              newLineNumber(startNumber: widget.weekDay) ||
+              newLineNumber(startNumber: weekDay) ||
           i == monthLastNumber) {
         int repeatNumber = 7 - listCache.length;
         for (int j = 0; j < repeatNumber; j++) {
@@ -203,7 +212,6 @@ class _CalendarState extends State<Calendar> {
       behavior: HitTestBehavior.opaque,
       child: Container(
         alignment: Alignment.topCenter,
-        //decoration: BoxDecoration(border: buildBorder()),
         child: Container(
           margin: const EdgeInsets.all(3),
           alignment: Alignment.center,
@@ -217,7 +225,6 @@ class _CalendarState extends State<Calendar> {
         ),
       ),
       onTap: () {
-        //print('${DateFormat('yyyy年M月d日').format(cacheDate)}が選択されました');
         selectedDate = cacheDate;
         setState(() {});
       },
@@ -235,11 +242,15 @@ class _CalendarState extends State<Calendar> {
     return defaultDateColor;
   }
 
-  selectDate({required BuildContext context, String? locale}) async {
+  selectDate(
+      {required BuildContext context,
+      String? locale,
+      required WidgetRef ref}) async {
+    var now = ref.read(nowProvider.notifier).state;
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
       context: context,
-      initialDate: _now,
+      initialDate: now,
       firstDate: DateTime(DateTime.now().year - 1),
       lastDate: DateTime(DateTime.now().year + 100),
       locale: localeObj,
@@ -248,7 +259,7 @@ class _CalendarState extends State<Calendar> {
     if (selectedDate == null) return;
 
     setState(() {
-      _now = selectedDate;
+      now = selectedDate;
     });
   }
 }
