@@ -47,6 +47,7 @@ class _EventAddingPageState extends State<EventAddingPage> {
             children: <Widget>[
               buildTitle(),
               buildTitle2(),
+              buildDescription(),
             ],
           ),
         ),

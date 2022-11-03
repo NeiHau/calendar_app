@@ -49,28 +49,42 @@ class CalendarState extends ConsumerState<Calendar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          OutlinedButton(
-            onPressed: () {
-              selectedDate = now; // '今日'と書かれたボタンを押すと、今日の日付に移行させたい。
-            },
-            child: const Text('今日'),
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+            child: ElevatedButton(
+              onPressed: () {
+                selectedDate = now; // '今日'と書かれたボタンを押すと、今日の日付に移行させたい。
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.white,
+                shape: const StadiumBorder(),
+              ),
+              child: const Text('今日'),
+            ),
           ),
           Row(
             children: [
-              Text(
-                DateFormat('yyyy年M月').format(
-                  DateTime(now.year, now.month + monthDuration, 1),
-                ),
-                style: const TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.black,
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                child: Text(
+                  DateFormat('yyyy年M月').format(
+                    DateTime(now.year, now.month + monthDuration, 1),
+                  ),
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.black,
+                  ),
                 ),
               ),
               GestureDetector(
-                child: const Icon(
-                  Icons.arrow_drop_down,
-                  size: 30,
-                  color: Colors.black,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 75, 5),
+                  child: const Icon(
+                    Icons.arrow_drop_down,
+                    size: 30,
+                    color: Colors.black,
+                  ),
                 ),
                 onTap: () {
                   setState(() {
@@ -192,9 +206,7 @@ class CalendarState extends ConsumerState<Calendar> {
           height: 30,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: (isToday)
-                ? widget.color ?? Theme.of(context).primaryColor
-                : Colors.transparent,
+            color: (isToday) ? Colors.blue : Colors.transparent,
           ),
           child: Text(
             '$i',

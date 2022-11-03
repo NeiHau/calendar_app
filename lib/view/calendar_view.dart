@@ -34,7 +34,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                     onTap: () {
                       createTask();
                     },
-                    child: const Calendar()); // 何曜日からはじまるか（月曜日は1,日曜日は7),
+                    child: const Calendar());
               },
             ),
           ),
@@ -72,6 +72,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Container(
                 decoration: const BoxDecoration(
                   border: Border(
@@ -94,7 +97,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            // （2） 実際に表示するページ(ウィジェット)を指定する
                             builder: (context) => EventAddingPage(),
                           ),
                         );
