@@ -1,21 +1,29 @@
 import 'package:first_app/model/event.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod/riverpod.dart';
 
-class EventAddingPage extends StatefulWidget {
+final startDayProvider = StateProvider((ref) => DateTime.now());
+final finishDayProvider = StateProvider((ref) => DateTime.now());
+
+class EventAddingPage extends ConsumerStatefulWidget {
   EventAddingPage({super.key, this.event});
 
   final Event? event;
 
   @override
-  State<EventAddingPage> createState() => _EventAddingPageState();
+  ConsumerState<EventAddingPage> createState() => EventAddingPageState();
 }
 
-class _EventAddingPageState extends State<EventAddingPage> {
+class EventAddingPageState extends ConsumerState<EventAddingPage> {
   final _formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   late DateTime fromDate;
   late DateTime toDate;
   late FocusNode addTaskFocusNode;
+
+  // （1） 選択済みの値を保存する変数
+  final _switchValues = [false, false];
 
   @override
   void initState() {
@@ -46,8 +54,14 @@ class _EventAddingPageState extends State<EventAddingPage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               buildTitle(),
+<<<<<<< HEAD
               buildTitle2(),
               buildDescription(),
+=======
+              //buildTitle2(),
+              selectShujitsuStartDay(),
+              buildDescription()
+>>>>>>> aa287f8 (コミット)
             ],
           ),
         ),
@@ -84,6 +98,46 @@ class _EventAddingPageState extends State<EventAddingPage> {
         ),
       );
 
+  /*
+  Widget scheduleBuild() {
+    return InkWell(
+      onTap: () {
+        showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return DatePickerAlertDialog();
+            });
+      },
+      child: Container(
+        height: 60,
+        child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const <Widget>[
+                Text(
+                  '',
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  '',
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 16,
+                  ),
+                ),
+
+              ],
+            )),
+      ),
+    );
+  }
+  */
+
+  /*
   Widget buildTitle2() => AlertDialog(
         title: Container(
           decoration: const BoxDecoration(
@@ -103,6 +157,42 @@ class _EventAddingPageState extends State<EventAddingPage> {
           ),
         ),
       );
+  */
+
+  Card selectShujitsuStartDay() {
+    return Card(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ListTile(
+            title: const Text('終日'),
+            trailing: createSwitch(0),
+          ),
+          ListTile(
+            title: const Text('終日'),
+            trailing: createSwitch(0),
+          ),
+          ListTile(
+            title: const Text('終日'),
+            trailing: createSwitch(0),
+          )
+        ],
+      ),
+    );
+  }
+
+  Switch createSwitch(int index) {
+    return Switch(
+      // （3） 現在のOF/OFF状態
+      value: _switchValues[index],
+      // （4） 値が変わった時
+      onChanged: (bool? value) {
+        setState(() {
+          _switchValues[index] = value!;
+        });
+      },
+    );
+  }
 
   Widget buildDescription() => Card(
         child: Container(
@@ -113,10 +203,16 @@ class _EventAddingPageState extends State<EventAddingPage> {
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
               border: UnderlineInputBorder(),
-              hintText: 'タイトルを入力してください',
+              hintText: 'あなたの好きなセクシー女優を入力してください',
             ),
             onFieldSubmitted: (_) {},
           ),
         ),
       );
+
+  /*
+  bool stringTime(DateTime date, WidgetRef ref) {
+    if
+  }
+  */
 }

@@ -1,8 +1,11 @@
-import 'package:first_app/page/event_adding_page.dart';
 import 'package:first_app/view/calendar.dart';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+=======
+import '../view/calendar.dart';
+>>>>>>> aa287f8 (コミット)
 
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -25,6 +28,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         children: [
           Expanded(
             child: PageView.builder(
+<<<<<<< HEAD
               controller: PageController(initialPage: 1500),
               onPageChanged: (value) {
                 getNextMonth();
@@ -35,7 +39,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       createTask();
                     },
                     child: const Calendar());
+=======
+              controller: PageController(initialPage: 1200),
+              itemBuilder: (context, index) {
+                return Calendar();
+>>>>>>> aa287f8 (コミット)
               },
+              onPageChanged: (value) {},
             ),
           ),
         ],
@@ -62,6 +72,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     }
     return now;
   }
+<<<<<<< HEAD
 
   void createTask() {
     var now = ref.read(nowProvider.notifier).state;
@@ -122,4 +133,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
       },
     );
   }
+=======
+>>>>>>> aa287f8 (コミット)
 }
