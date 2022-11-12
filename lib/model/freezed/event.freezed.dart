@@ -16,10 +16,12 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$Event {
+  String? get id => throw _privateConstructorUsedError;
+  DateTime? get selectedDate => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
-  DateTime? get fromDay => throw _privateConstructorUsedError;
-  DateTime? get toDay => throw _privateConstructorUsedError;
+  DateTime? get startDate => throw _privateConstructorUsedError;
+  DateTime? get endDate => throw _privateConstructorUsedError;
   bool get isAllDay => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -32,10 +34,12 @@ abstract class $EventCopyWith<$Res> {
       _$EventCopyWithImpl<$Res, Event>;
   @useResult
   $Res call(
-      {String title,
+      {String? id,
+      DateTime? selectedDate,
+      String title,
       String description,
-      DateTime? fromDay,
-      DateTime? toDay,
+      DateTime? startDate,
+      DateTime? endDate,
       bool isAllDay});
 }
 
@@ -52,13 +56,23 @@ class _$EventCopyWithImpl<$Res, $Val extends Event>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
+    Object? selectedDate = freezed,
     Object? title = null,
     Object? description = null,
-    Object? fromDay = freezed,
-    Object? toDay = freezed,
+    Object? startDate = freezed,
+    Object? endDate = freezed,
     Object? isAllDay = null,
   }) {
     return _then(_value.copyWith(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
+      selectedDate: freezed == selectedDate
+          ? _value.selectedDate
+          : selectedDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -67,13 +81,13 @@ class _$EventCopyWithImpl<$Res, $Val extends Event>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
-      fromDay: freezed == fromDay
-          ? _value.fromDay
-          : fromDay // ignore: cast_nullable_to_non_nullable
+      startDate: freezed == startDate
+          ? _value.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      toDay: freezed == toDay
-          ? _value.toDay
-          : toDay // ignore: cast_nullable_to_non_nullable
+      endDate: freezed == endDate
+          ? _value.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       isAllDay: null == isAllDay
           ? _value.isAllDay
@@ -90,10 +104,12 @@ abstract class _$$_EventCopyWith<$Res> implements $EventCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {String title,
+      {String? id,
+      DateTime? selectedDate,
+      String title,
       String description,
-      DateTime? fromDay,
-      DateTime? toDay,
+      DateTime? startDate,
+      DateTime? endDate,
       bool isAllDay});
 }
 
@@ -106,13 +122,23 @@ class __$$_EventCopyWithImpl<$Res> extends _$EventCopyWithImpl<$Res, _$_Event>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
+    Object? selectedDate = freezed,
     Object? title = null,
     Object? description = null,
-    Object? fromDay = freezed,
-    Object? toDay = freezed,
+    Object? startDate = freezed,
+    Object? endDate = freezed,
     Object? isAllDay = null,
   }) {
     return _then(_$_Event(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
+      selectedDate: freezed == selectedDate
+          ? _value.selectedDate
+          : selectedDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -121,13 +147,13 @@ class __$$_EventCopyWithImpl<$Res> extends _$EventCopyWithImpl<$Res, _$_Event>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
-      fromDay: freezed == fromDay
-          ? _value.fromDay
-          : fromDay // ignore: cast_nullable_to_non_nullable
+      startDate: freezed == startDate
+          ? _value.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      toDay: freezed == toDay
-          ? _value.toDay
-          : toDay // ignore: cast_nullable_to_non_nullable
+      endDate: freezed == endDate
+          ? _value.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       isAllDay: null == isAllDay
           ? _value.isAllDay
@@ -141,12 +167,18 @@ class __$$_EventCopyWithImpl<$Res> extends _$EventCopyWithImpl<$Res, _$_Event>
 
 class _$_Event implements _Event {
   _$_Event(
-      {this.title = '',
+      {this.id,
+      this.selectedDate,
+      this.title = '',
       this.description = '',
-      this.fromDay = null,
-      this.toDay = null,
-      this.isAllDay = true});
+      this.startDate = null,
+      this.endDate = null,
+      this.isAllDay = false});
 
+  @override
+  final String? id;
+  @override
+  final DateTime? selectedDate;
   @override
   @JsonKey()
   final String title;
@@ -155,17 +187,17 @@ class _$_Event implements _Event {
   final String description;
   @override
   @JsonKey()
-  final DateTime? fromDay;
+  final DateTime? startDate;
   @override
   @JsonKey()
-  final DateTime? toDay;
+  final DateTime? endDate;
   @override
   @JsonKey()
   final bool isAllDay;
 
   @override
   String toString() {
-    return 'Event(title: $title, description: $description, fromDay: $fromDay, toDay: $toDay, isAllDay: $isAllDay)';
+    return 'Event(id: $id, selectedDate: $selectedDate, title: $title, description: $description, startDate: $startDate, endDate: $endDate, isAllDay: $isAllDay)';
   }
 
   @override
@@ -173,18 +205,22 @@ class _$_Event implements _Event {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_Event &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.selectedDate, selectedDate) ||
+                other.selectedDate == selectedDate) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
-            (identical(other.fromDay, fromDay) || other.fromDay == fromDay) &&
-            (identical(other.toDay, toDay) || other.toDay == toDay) &&
+            (identical(other.startDate, startDate) ||
+                other.startDate == startDate) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate) &&
             (identical(other.isAllDay, isAllDay) ||
                 other.isAllDay == isAllDay));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, description, fromDay, toDay, isAllDay);
+  int get hashCode => Object.hash(runtimeType, id, selectedDate, title,
+      description, startDate, endDate, isAllDay);
 
   @JsonKey(ignore: true)
   @override
@@ -195,20 +231,26 @@ class _$_Event implements _Event {
 
 abstract class _Event implements Event {
   factory _Event(
-      {final String title,
+      {final String? id,
+      final DateTime? selectedDate,
+      final String title,
       final String description,
-      final DateTime? fromDay,
-      final DateTime? toDay,
+      final DateTime? startDate,
+      final DateTime? endDate,
       final bool isAllDay}) = _$_Event;
 
+  @override
+  String? get id;
+  @override
+  DateTime? get selectedDate;
   @override
   String get title;
   @override
   String get description;
   @override
-  DateTime? get fromDay;
+  DateTime? get startDate;
   @override
-  DateTime? get toDay;
+  DateTime? get endDate;
   @override
   bool get isAllDay;
   @override

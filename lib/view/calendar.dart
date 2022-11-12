@@ -1,20 +1,22 @@
 import 'package:first_app/page/event_adding_page.dart';
+import 'package:first_app/view/calendar_event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 final weekDayProvider = StateProvider(((ref) => 7));
-final nowProvider = StateProvider(((ref) => DateTime.now()));
+final foucusedDayProvider = StateProvider(((ref) => DateTime.now()));
 final cacheDateProvider = StateProvider(((ref) => DateTime.now()));
+final whiteColorProvider = StateProvider(((ref) => Colors.white));
 
 class Calendar extends ConsumerStatefulWidget {
   final Color? color;
   final DateTime? now;
-  DateTime? weekDay;
+  final DateTime? weekDay;
   final PageController calendarController;
 
-  Calendar(this.calendarController,
+  const Calendar(this.calendarController,
       {this.color, this.now, this.weekDay, Key? key})
       : super(key: key);
 
@@ -31,7 +33,7 @@ class CalendarState extends ConsumerState<Calendar> {
 
   @override
   void initState() {
-    selectedDate = ref.read(nowProvider.notifier).state;
+    selectedDate = ref.read(foucusedDayProvider.notifier).state;
     final initialPageCount = getPageCount(firstDay, selectedDate);
     prevPage = initialPageCount;
     super.initState();
@@ -41,16 +43,16 @@ class CalendarState extends ConsumerState<Calendar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        currentMonth(),
+        currentMonth(ref),
         dayOfWeek(ref),
         Expanded(child: calendar(ref)),
       ],
     );
   }
 
-  Container currentMonth() {
+  Container currentMonth(WidgetRef ref) {
     return Container(
-      color: Colors.white,
+      color: ref.read(whiteColorProvider.notifier).state,
       height: 45,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -63,13 +65,13 @@ class CalendarState extends ConsumerState<Calendar> {
                     backgroundColor: Colors.white,
                     shape: const StadiumBorder()),
                 onPressed: () {
-                  widget.calendarController.animateToPage(
-                      widget.calendarController.initialPage,
-                      duration: const Duration(milliseconds: 150),
-                      curve: Curves.ease);
                   setState(() {
                     selectedDate = DateTime.now();
                   });
+                  widget.calendarController.animateToPage(
+                      widget.calendarController.initialPage,
+                      duration: const Duration(milliseconds: 5),
+                      curve: Curves.ease);
                 },
                 child: const Text('今日')),
           ),
@@ -78,8 +80,8 @@ class CalendarState extends ConsumerState<Calendar> {
               padding: const EdgeInsets.fromLTRB(0, 5, 13, 5),
               child: Text(
                 DateFormat('yyyy年M月').format(DateTime(
-                    ref.read(nowProvider).year,
-                    ref.read(nowProvider).month + _monthDuration,
+                    ref.read(foucusedDayProvider).year,
+                    ref.read(foucusedDayProvider).month + _monthDuration,
                     1)),
                 style: const TextStyle(fontSize: 20.0, color: Colors.black),
               ),
@@ -138,22 +140,27 @@ class CalendarState extends ConsumerState<Calendar> {
   Widget calendar(WidgetRef ref) {
     List<Widget> list = [];
 
-    DateTime firstDayOfTheMonth = DateTime(ref.watch(nowProvider).year,
-        ref.watch(nowProvider).month + _monthDuration, 1);
+    DateTime firstDayOfTheMonth = DateTime(ref.watch(foucusedDayProvider).year,
+        ref.watch(foucusedDayProvider).month + _monthDuration, 1);
     int monthLastNumber =
         DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month + 1, 1)
             .add(const Duration(days: -1))
             .day;
+    int previousMonthLastNumber =
+        DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, 1)
+            .add(const Duration(days: -1))
+            .day;
+    int nextMonthFirstNumber =
+        DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month + 1, 1).day;
     List<Widget> listCache = [];
-
-    //DateTime additionalDate = ;
-    List<DateTime> additionalDates = [];
 
     for (int i = 1; i <= monthLastNumber; i++) {
       listCache.add(
         Expanded(
-          child: buildCalendarItem(i,
-              DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)),
+          child: buildCalendarItem(
+              i,
+              DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
+              ref),
         ),
       );
 
@@ -162,18 +169,31 @@ class CalendarState extends ConsumerState<Calendar> {
               newLineNumber(startNumber: ref.read(weekDayProvider) + 1) ||
           i == monthLastNumber) {
         int repeatNumber = 7 - listCache.length;
-        //print(repeatNumber);
+
         for (int j = 0; j < repeatNumber; j++) {
           if (DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)
                   .day <=
               7) {
             listCache.insert(
-              0,
-              Expanded(child: Container()),
-            );
+                0,
+                Expanded(
+                  child: buildCalendarItem(
+                      previousMonthLastNumber - j,
+                      DateTime(
+                          firstDayOfTheMonth.year,
+                          firstDayOfTheMonth.month - 1,
+                          previousMonthLastNumber - j),
+                      ref),
+                ));
           } else {
             listCache.add(
-              Expanded(child: Container()),
+              Expanded(
+                child: buildCalendarItem(
+                    nextMonthFirstNumber + j,
+                    DateTime(firstDayOfTheMonth.year,
+                        firstDayOfTheMonth.month + 1, nextMonthFirstNumber + j),
+                    ref),
+              ),
             );
           }
         }
@@ -195,11 +215,44 @@ class CalendarState extends ConsumerState<Calendar> {
     return startNumber - 1;
   }
 
-  Widget buildCalendarItem(int i, DateTime cacheDate) {
+  Widget buildCalendarItem(int i, DateTime cacheDate, WidgetRef ref) {
+    final focusedDay = ref.read(foucusedDayProvider);
     bool isToday = (selectedDate.difference(cacheDate).inDays == 0) &&
         (selectedDate.day == cacheDate.day);
+    bool isOutsideDay = (focusedDay.month != cacheDate.month);
 
     if (isToday) {
+      return Container(
+        alignment: Alignment.topCenter,
+        child: Container(
+          margin: const EdgeInsets.all(3),
+          alignment: Alignment.center,
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: (isToday) ? Colors.blue : Colors.transparent, //ここの色を変える。
+          ),
+          child: GestureDetector(
+            onTap: () {
+              createTask(cacheDate);
+            },
+            child: Text(
+              '$i',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 14.0,
+                  color: (isToday)
+                      ? ref.read(whiteColorProvider.notifier).state
+                      : Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (isOutsideDay) {
       return Container(
         alignment: Alignment.topCenter,
         child: Container(
@@ -220,7 +273,7 @@ class CalendarState extends ConsumerState<Calendar> {
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 14.0,
-                  color: (isToday) ? Colors.white : Colors.black,
+                  color: (isToday) ? Colors.white : Colors.blueGrey[100],
                   fontWeight: FontWeight.bold),
             ),
           ),
@@ -281,7 +334,7 @@ class CalendarState extends ConsumerState<Calendar> {
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
         context: context,
-        initialDate: ref.read(nowProvider),
+        initialDate: ref.read(foucusedDayProvider),
         firstDate: DateTime(DateTime.now().year - 1),
         lastDate: DateTime(DateTime.now().year + 100),
         locale: localeObj);
@@ -289,7 +342,7 @@ class CalendarState extends ConsumerState<Calendar> {
     if (selectedDate == null) return;
 
     setState(() {
-      ref.read(nowProvider.notifier).state = selectedDate;
+      ref.read(foucusedDayProvider.notifier).state = selectedDate;
     });
   }
 
@@ -301,61 +354,59 @@ class CalendarState extends ConsumerState<Calendar> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height *
-                  0.7, //全体の大きさからどのくらいの大きさにするかを決める。
-              child: PageView.builder(
-                controller: controller,
-                itemBuilder: (context, index) {
-                  DateTime currentDate =
-                      getCurrentDate(initialPage, index, cacheDate);
-                  return AlertDialog(
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                    ),
-                    title: Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black12,
-                            width: 1,
-                          ),
+        return Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.71,
+            child: PageView.builder(
+              controller: controller,
+              itemBuilder: (context, index) {
+                DateTime currentDate =
+                    getCurrentDate(initialPage, index, cacheDate);
+                return AlertDialog(
+                  insetPadding: const EdgeInsets.all(8),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                  ),
+                  title: Container(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.black12,
+                          width: 1,
                         ),
                       ),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              DateFormat('yyyy/MM/dd (EEE)', 'ja').format(
-                                DateTime(currentDate.year, currentDate.month,
-                                    currentDate.day),
-                              ),
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              EventAddingPage()));
-                                },
-                                icon:
-                                    const Icon(Icons.add, color: Colors.blue)),
-                          ]),
                     ),
-                    content: const SizedBox(
-                        height: 360,
-                        width: 400,
-                        child: Center(child: Text('予定がありません。'))),
-                  );
-                },
-              ),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            DateFormat('yyyy/MM/dd (EEE)', 'ja').format(
+                              DateTime(currentDate.year, currentDate.month,
+                                  currentDate.day),
+                            ),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.normal),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const EventAddingPage()));
+                              },
+                              icon: const Icon(Icons.add, color: Colors.blue)),
+                        ]),
+                  ),
+                  content: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: const CalendarEventList(),
+                  ),
+                );
+              },
             ),
-          ],
-        );
+          ),
+        ]);
       },
     );
   }

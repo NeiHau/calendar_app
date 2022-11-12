@@ -20,11 +20,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
   void initState() {
     initialPage = _getInitialPageCount(firstDay, now);
     calendarController = PageController(initialPage: initialPage);
-    print(calendarController.initialPage);
     super.initState();
   }
 
-  String? newTask;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,10 +39,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                 return Calendar(calendarController);
               },
               onPageChanged: (value) {
-                ref.read(nowProvider.notifier).update((state) {
+                ref.read(foucusedDayProvider.notifier).update((state) {
                   final distance = initialPage - value;
                   return DateTime(now.year, now.month - distance);
                 });
+                setState(() {});
               },
             ),
           ),

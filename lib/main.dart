@@ -1,3 +1,4 @@
+import 'package:first_app/page/event_editing_page.dart';
 import 'package:first_app/view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 void main() {
+// データベース
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -32,6 +34,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      routes: {
+        //"/home": (context) => const CalendarPage(),
+        //"/EventList": (context) => const CalendarEventList(),
+        "/EditingPage": (context) => EventEditingPage(),
+      },
       home: const CalendarPage(),
     );
   }
