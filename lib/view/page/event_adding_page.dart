@@ -1,7 +1,5 @@
-import 'package:first_app/model/db/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/model/freezed/event_state_data.dart';
-import 'package:first_app/state_notifier/add_event_state_notifier.dart';
+import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:first_app/view/calendar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +8,6 @@ import 'package:intl/intl.dart';
 
 final startDayProvider = StateProvider((ref) => DateTime.now());
 final finishDayProvider = StateProvider((ref) => DateTime.now());
-
-//final tempProvider = StateProvider(((ref) => Event()));
 
 class EventAddingPage extends ConsumerStatefulWidget {
   const EventAddingPage({super.key, this.event});
@@ -31,7 +27,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   bool isAllDay = false;
 
   Event temp = Event(); //frezzedで格納した値をインスタンス化
-  //TodoStateData
 
   @override
   void initState() {
@@ -45,9 +40,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final todoState = ref.watch(todoDatabaseProvider);
-    final todoProvider = ref.watch(todoDatabaseProvider.notifier);
-    List<TodoItemData> todoItems = todoProvider.state.todoItems;
+    //final todoState = ref.watch(todoDatabaseProvider);
+    //final todoProvider = ref.watch(todoDatabaseProvider.notifier);
+    //List<TodoItemData> todoItems = todoProvider.state.todoItems;
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -67,7 +62,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             children: <Widget>[
               buildTitle(),
               sizedBox(), // 余白を入れてあげる。
-              selectShujitsuStartDay(),
+              selectShujitsuDay(),
               buildDescription(),
             ],
           ),
@@ -118,7 +113,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         ),
       );
 
-  Card selectShujitsuStartDay() {
+  Card selectShujitsuDay() {
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +144,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     startDate.month,
                     startDate.day,
                     startDate.hour,
-                    //startDate.minute, //ここで分を計算したい。 新しい変数をここで宣言してあげる。
+                    //startDate.minute, // 見直し。エラー起きた。
                   ),
                 ));
               },
@@ -177,7 +172,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     endDate.month,
                     endDate.day,
                     endDate.hour,
-                    //startDate.minute,  //ここも同様。新しい変数をここで宣言してあげる。
+                    //startDate.minute,  // 見直し。エラー起きた。
                   ),
                 ));
               },
@@ -225,6 +220,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
     );
   }
 
+  // 開始日と終了日を選択する際に用いるDatePickerを表示させるメソッド。
   Future<void> cupertinoDatePicker(Widget child) async {
     showCupertinoModalPopup(
         context: context,
@@ -281,6 +277,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             ));
   }
 
+  // 余白を作るためのメソッド。
   Widget sizedBox() {
     return const SizedBox(
       height: 25,

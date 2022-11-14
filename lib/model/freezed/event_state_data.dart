@@ -5,10 +5,9 @@ part 'event_state_data.freezed.dart';
 
 @freezed
 abstract class TodoStateData with _$TodoStateData {
-  //このクラスは、DBの状態を保持するクラスです。
+  //DBの状態を保持するクラス。
   factory TodoStateData({
-    //@Default(false) bool isLoading,
-    @Default(false) bool isReadyData,
+    //@Default(false) bool isReadyData,
     @Default([]) List<TodoItemData> todoItems,
   }) = _TodoStateData;
 }

@@ -5,12 +5,8 @@ import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-// assuming that your file is called filename.dart. This will give an error at
-// first, but it's needed for drift to know about the generated code
 part 'todo_item_data.g.dart';
 
-// this will generate a table called "todos" for us. The rows of that table will
-// be represented by a class called "Todo".
 class TodoItem extends Table {
   IntColumn get id => integer().autoIncrement()();
 
@@ -26,8 +22,6 @@ class TodoItem extends Table {
   BoolColumn get shujitsuBool => boolean().withDefault(const Constant(false))();
 }
 
-// this annotation tells drift to prepare a database class that uses both of the
-// tables we just defined. We'll see how to use that database class in a moment.
 @DriftDatabase(tables: [TodoItem])
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());

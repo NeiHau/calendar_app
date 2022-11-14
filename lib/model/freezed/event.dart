@@ -4,7 +4,7 @@ part 'event.freezed.dart';
 
 @freezed
 abstract class Event with _$Event {
-  //このクラスは、入力中のtodoを保持するクラスです。
+  //入力中のtodoを保持するクラス。
   factory Event({
     String? id,
     //DateTime? selectedDate,

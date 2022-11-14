@@ -1,21 +1,19 @@
 import 'package:first_app/model/db/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/state_notifier/add_event_state_notifier.dart';
+import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:first_app/view/calendar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../view/calendar_event_list.dart';
 
 final startDayProvider = StateProvider((ref) => DateTime.now());
 final finishDayProvider = StateProvider((ref) => DateTime.now());
 
 class EventEditingPage extends ConsumerStatefulWidget {
-  EventEditingPage({this.event, super.key});
+  const EventEditingPage({this.event, super.key});
 
   final Event? event;
-  CalendarEventList calendarEventList = const CalendarEventList();
 
   @override
   ConsumerState<EventEditingPage> createState() => EventEditingPageState();
@@ -66,10 +64,10 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             children: <Widget>[
               buildTitle(args),
               sizedBox(),
-              selectShujitsuStartDay(args),
+              selectShujitsuDay(args),
               buildDescription(args),
               sizedBox(),
-              deleteSchedule(todoItems, todoProvider),
+              deleteSchedule(todoItems, todoProvider, args),
             ],
           ),
         ),
@@ -77,6 +75,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     );
   }
 
+  // 「保存」ボタンを作成するメソッド
   List<Widget> buildEditingActions() => [
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 5, 10),
@@ -92,6 +91,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
         )
       ];
 
+  // タイトルを入力するメソッド
   Widget buildTitle(TodoItemData data) => Card(
         child: Container(
           padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
@@ -111,7 +111,8 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
         ),
       );
 
-  Card selectShujitsuStartDay(TodoItemData data) {
+  // 開始日と終了日を選択するメソッド
+  Card selectShujitsuDay(TodoItemData data) {
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -152,8 +153,8 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
               child: Text(isAllDay
-                  ? DateFormat('yyyy-MM-dd').format(startDate)
-                  : DateFormat('yyyy-MM-dd HH:mm').format(startDate)),
+                  ? DateFormat('yyyy-MM-dd').format(endDate)
+                  : DateFormat('yyyy-MM-dd HH:mm').format(endDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
@@ -179,6 +180,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     );
   }
 
+  // 終日スイッチを作成するメソッド
   Switch createSwitch(int index) {
     return Switch(
       value: isAllDay,
@@ -190,6 +192,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     );
   }
 
+  // コメント入力するフォームを作成するメソッド
   Widget buildDescription(TodoItemData data) {
     return Card(
       child: Container(
@@ -209,8 +212,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     );
   }
 
-  Widget deleteSchedule(
-      List<TodoItemData> todoItemList, TodoDatabaseNotifier db) {
+  // 予定を削除するメソッド
+  Widget deleteSchedule(List<TodoItemData> todoItemList,
+      TodoDatabaseNotifier db, TodoItemData data) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.red,
@@ -245,7 +249,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // db.deleteData();
+                                db.deleteData(data);
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -275,6 +279,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     );
   }
 
+  // 開始日と終了日を選択する際に用いるDatePickerを表示させるメソッド
   Future<void> cupertinoDatePicker(Widget child) async {
     showCupertinoModalPopup(
         context: context,
@@ -331,6 +336,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             ));
   }
 
+  // 余白を作りたい時に用いるメソッド
   Widget sizedBox() {
     return const SizedBox(
       height: 25,
@@ -338,10 +344,3 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     );
   }
 }
-
-/*
-for (TodoItemData item in todoItemList) {
-                                  db.deleteData(item);
-                                }
-
-*/

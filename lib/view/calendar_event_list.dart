@@ -1,5 +1,5 @@
 import 'package:first_app/model/db/todo_item_data.dart';
-import 'package:first_app/state_notifier/add_event_state_notifier.dart';
+import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:first_app/view/calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,6 +33,7 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
     );
   }
 
+  // 予定追加画面において、todoリストを作成するメソッド。
   List<Widget> buildTodoList(
       List<TodoItemData> todoItemList, TodoDatabaseNotifier db) {
     for (TodoItemData item in todoItemList) {
@@ -49,7 +50,12 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
               Navigator.pushNamed(context, "/EditingPage", arguments: item),
           child: ListTile(
             tileColor: ref.read(whiteColorProvider.notifier).state,
-            leading: Text(item.startDate.toString()),
+            leading: Column(
+              children: [
+                Text(item.startDate.toString()),
+                Text(item.startDate.toString()),
+              ],
+            ),
             trailing: Title(
               color: Colors.black,
               child: Text(item.title),

@@ -12,9 +12,9 @@ final todoDatabaseProvider = StateNotifierProvider((_) {
 });
 
 class TodoDatabaseNotifier extends StateNotifier<TodoStateData> {
-  //データベースの状態が変わるたびTodoのviewをビルドするようにするクラスです。
+  //データベースの状態が変わるたびTodoのviewをビルドするようにするクラス。
   TodoDatabaseNotifier() : super(TodoStateData());
-  //ここからはデータベースに関する処理をこのクラスで行えるように記述します。
+  //ここからはデータベースに関する処理をこのクラスで行えるように記述する。
   final _db = MyDatabase();
   //書き込み処理部分
   writeData(Event data) async {
@@ -35,7 +35,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoStateData> {
 
   //削除処理部分
   deleteData(TodoItemData data) async {
-    //state = state.copyWith();
+    state = state.copyWith();
     await _db.deleteTodo(data.id);
     readData();
     //削除するたびにデータベースを読み込む
@@ -46,7 +46,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoStateData> {
     if (data.title.isEmpty) {
       return;
     }
-    //state = state.copyWith(isLoading: true);
     await _db.updateTodo(data);
     readData();
     //更新するたびにデータベースを読み込む
@@ -54,23 +53,10 @@ class TodoDatabaseNotifier extends StateNotifier<TodoStateData> {
 
   //データ読み込み処理
   readData() async {
-    //state = state.copyWith(isLoading: true);
-
     final todoItems = await _db.readAllTodoData();
 
     state = state.copyWith(
-      isReadyData: true,
       todoItems: todoItems,
     );
-    /*
-    state = state.copyWith(
-      todoItems: todoItems,
-    );
-    */
-    //stateを更新します
-    //freezedを使っているので、copyWithを使うことができます
-    //これは、stateの中身をすべて更新する必要がありません。例えば
-    //state.copyWith(isLoading: true)のように一つの値だけを更新することもできます。
-    //複数の値を監視したい際、これはとても便利です。
   }
 }
