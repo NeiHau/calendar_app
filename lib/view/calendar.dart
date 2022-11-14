@@ -1,4 +1,4 @@
-import 'package:first_app/page/event_adding_page.dart';
+import 'package:first_app/view/page/event_adding_page.dart';
 import 'package:first_app/view/calendar_event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -50,6 +50,7 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
+  // 今月のカレンダー画面で表示させたい機能('今日ボタン', '年月', 'MonthYearPicker')を含むメソッド
   Container currentMonth(WidgetRef ref) {
     return Container(
       color: ref.read(whiteColorProvider.notifier).state,
@@ -108,6 +109,7 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
+  // カレンダーの曜日を表示させるメソッド
   Widget dayOfWeek(WidgetRef ref) {
     List<Widget> weekList = [];
     int weekIndex = ref.read(weekDayProvider); //初期値
@@ -137,19 +139,24 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
+  // カレンダーの日にちを作成するメソッド
   Widget calendar(WidgetRef ref) {
-    List<Widget> list = [];
+    List<Widget> list = []; // カレンダーの日数全てを含むリスト。1日〜最終日まで。
 
+    // 月の最初の日。
     DateTime firstDayOfTheMonth = DateTime(ref.watch(foucusedDayProvider).year,
         ref.watch(foucusedDayProvider).month + _monthDuration, 1);
+    // 月の最終日。
     int monthLastNumber =
         DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month + 1, 1)
             .add(const Duration(days: -1))
             .day;
+    // 今月のカレンダーの第一週の空いている部分を埋める際に用いる、前月の最後の週の日にちを求める変数。
     int previousMonthLastNumber =
         DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, 1)
             .add(const Duration(days: -1))
             .day;
+    // 今月のカレンダーの最後の週の空いている部分を埋める際に用いる、来月の第一週目の日にちを求める変数。
     int nextMonthFirstNumber =
         DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month + 1, 1).day;
     List<Widget> listCache = [];
@@ -210,11 +217,15 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
+  // 次の週に移行する際に用いるメソッド。例: 第一週目 → 第二週目。
   int newLineNumber({required int startNumber}) {
     if (startNumber == 1) return 7;
     return startNumber - 1;
   }
 
+  // 1. 今日を青い丸で囲む。
+  // 2. 日付をタップした際に予定を追加する画面に移行する。
+  // 上記の二点を以下のメソッド内で行う。
   Widget buildCalendarItem(int i, DateTime cacheDate, WidgetRef ref) {
     final focusedDay = ref.read(foucusedDayProvider);
     bool isToday = (selectedDate.difference(cacheDate).inDays == 0) &&
@@ -306,6 +317,7 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
+  // 「土」と「日」の色を変更するメソッド。「土」は青、「日」は赤。
   Color _textDayColor(DateTime day) {
     const defaultTextColor = Colors.black87;
 
@@ -318,6 +330,7 @@ class CalendarState extends ConsumerState<Calendar> {
     return defaultTextColor;
   }
 
+  // カレンダーの日付が土曜日なら青色、日曜日なら赤色に変更するメソッド。
   Color _textWeekDayColor(int weekIndex) {
     const defaultTextColor = Colors.black87;
 
@@ -330,6 +343,7 @@ class CalendarState extends ConsumerState<Calendar> {
     return defaultTextColor;
   }
 
+  // MonthYearPickerを表示させるメソッド。
   selectDate({required BuildContext context, String? locale}) async {
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
@@ -346,6 +360,7 @@ class CalendarState extends ConsumerState<Calendar> {
     });
   }
 
+  // 日付をタップした際に表示させる予定追加画面のメソッド。
   void createTask(DateTime cacheDate) {
     final PageController controller;
     final initialPage = getPageCount(firstDay, cacheDate);
@@ -411,10 +426,12 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
+  // 現在の日付から、指定されている日付(1970年1月)まで、どのくらいの月数があるかを計算するメソッド。
   int getPageCount(DateTime firstDate, DateTime selectedDate) {
     return selectedDate.difference(firstDate).inDays;
   }
 
+  // 選択された日付が、今日からどれくらい離れているかを計算するメソッド。
   DateTime getCurrentDate(int initial, int page, DateTime cacheDate) {
     final distance = initial - page;
     return DateTime(cacheDate.year, cacheDate.month, cacheDate.day - distance);
