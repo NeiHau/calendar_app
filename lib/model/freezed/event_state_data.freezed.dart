@@ -16,9 +16,8 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$TodoStateData {
-//@Default(false) bool isLoading,
-  bool get isReadyData => throw _privateConstructorUsedError;
-  List<TodoItemData> get todoItems => throw _privateConstructorUsedError;
+  Map<DateTime, List<Event>> get todoItemsMap =>
+      throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $TodoStateDataCopyWith<TodoStateData> get copyWith =>
@@ -31,7 +30,7 @@ abstract class $TodoStateDataCopyWith<$Res> {
           TodoStateData value, $Res Function(TodoStateData) then) =
       _$TodoStateDataCopyWithImpl<$Res, TodoStateData>;
   @useResult
-  $Res call({bool isReadyData, List<TodoItemData> todoItems});
+  $Res call({Map<DateTime, List<Event>> todoItemsMap});
 }
 
 /// @nodoc
@@ -47,18 +46,13 @@ class _$TodoStateDataCopyWithImpl<$Res, $Val extends TodoStateData>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isReadyData = null,
-    Object? todoItems = null,
+    Object? todoItemsMap = null,
   }) {
     return _then(_value.copyWith(
-      isReadyData: null == isReadyData
-          ? _value.isReadyData
-          : isReadyData // ignore: cast_nullable_to_non_nullable
-              as bool,
-      todoItems: null == todoItems
-          ? _value.todoItems
-          : todoItems // ignore: cast_nullable_to_non_nullable
-              as List<TodoItemData>,
+      todoItemsMap: null == todoItemsMap
+          ? _value.todoItemsMap
+          : todoItemsMap // ignore: cast_nullable_to_non_nullable
+              as Map<DateTime, List<Event>>,
     ) as $Val);
   }
 }
@@ -71,7 +65,7 @@ abstract class _$$_TodoStateDataCopyWith<$Res>
       __$$_TodoStateDataCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({bool isReadyData, List<TodoItemData> todoItems});
+  $Res call({Map<DateTime, List<Event>> todoItemsMap});
 }
 
 /// @nodoc
@@ -85,18 +79,13 @@ class __$$_TodoStateDataCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isReadyData = null,
-    Object? todoItems = null,
+    Object? todoItemsMap = null,
   }) {
     return _then(_$_TodoStateData(
-      isReadyData: null == isReadyData
-          ? _value.isReadyData
-          : isReadyData // ignore: cast_nullable_to_non_nullable
-              as bool,
-      todoItems: null == todoItems
-          ? _value._todoItems
-          : todoItems // ignore: cast_nullable_to_non_nullable
-              as List<TodoItemData>,
+      todoItemsMap: null == todoItemsMap
+          ? _value._todoItemsMap
+          : todoItemsMap // ignore: cast_nullable_to_non_nullable
+              as Map<DateTime, List<Event>>,
     ));
   }
 }
@@ -104,25 +93,20 @@ class __$$_TodoStateDataCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_TodoStateData implements _TodoStateData {
-  _$_TodoStateData(
-      {this.isReadyData = false, final List<TodoItemData> todoItems = const []})
-      : _todoItems = todoItems;
+  _$_TodoStateData({final Map<DateTime, List<Event>> todoItemsMap = const {}})
+      : _todoItemsMap = todoItemsMap;
 
-//@Default(false) bool isLoading,
+  final Map<DateTime, List<Event>> _todoItemsMap;
   @override
   @JsonKey()
-  final bool isReadyData;
-  final List<TodoItemData> _todoItems;
-  @override
-  @JsonKey()
-  List<TodoItemData> get todoItems {
+  Map<DateTime, List<Event>> get todoItemsMap {
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_todoItems);
+    return EqualUnmodifiableMapView(_todoItemsMap);
   }
 
   @override
   String toString() {
-    return 'TodoStateData(isReadyData: $isReadyData, todoItems: $todoItems)';
+    return 'TodoStateData(todoItemsMap: $todoItemsMap)';
   }
 
   @override
@@ -130,15 +114,13 @@ class _$_TodoStateData implements _TodoStateData {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_TodoStateData &&
-            (identical(other.isReadyData, isReadyData) ||
-                other.isReadyData == isReadyData) &&
             const DeepCollectionEquality()
-                .equals(other._todoItems, _todoItems));
+                .equals(other._todoItemsMap, _todoItemsMap));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, isReadyData,
-      const DeepCollectionEquality().hash(_todoItems));
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_todoItemsMap));
 
   @JsonKey(ignore: true)
   @override
@@ -148,14 +130,11 @@ class _$_TodoStateData implements _TodoStateData {
 }
 
 abstract class _TodoStateData implements TodoStateData {
-  factory _TodoStateData(
-      {final bool isReadyData,
-      final List<TodoItemData> todoItems}) = _$_TodoStateData;
+  factory _TodoStateData({final Map<DateTime, List<Event>> todoItemsMap}) =
+      _$_TodoStateData;
 
-  @override //@Default(false) bool isLoading,
-  bool get isReadyData;
   @override
-  List<TodoItemData> get todoItems;
+  Map<DateTime, List<Event>> get todoItemsMap;
   @override
   @JsonKey(ignore: true)
   _$$_TodoStateDataCopyWith<_$_TodoStateData> get copyWith =>

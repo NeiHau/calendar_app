@@ -1,4 +1,5 @@
-import 'package:first_app/view/page/event_adding_page.dart';
+import 'package:first_app/component/color.dart';
+import 'package:first_app/view/eventAdding/EditingPage/event_adding_page.dart';
 import 'package:first_app/view/calendar_event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -53,7 +54,7 @@ class CalendarState extends ConsumerState<Calendar> {
   // 今月のカレンダー画面で表示させたい機能('今日ボタン', '年月', 'MonthYearPicker')を含むメソッド
   Container currentMonth(WidgetRef ref) {
     return Container(
-      color: ref.read(whiteColorProvider.notifier).state,
+      color: ref.read(whiteColorProvider),
       height: 45,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,17 +63,17 @@ class CalendarState extends ConsumerState<Calendar> {
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.white,
+                    foregroundColor: ref.read(blackProvider),
+                    backgroundColor: ref.read(whiteColorProvider),
                     shape: const StadiumBorder()),
                 onPressed: () {
-                  setState(() {
-                    selectedDate = DateTime.now();
-                  });
                   widget.calendarController.animateToPage(
                       widget.calendarController.initialPage,
                       duration: const Duration(milliseconds: 5),
                       curve: Curves.ease);
+                  setState(() {
+                    selectedDate = DateTime.now();
+                  });
                 },
                 child: const Text('今日')),
           ),
@@ -80,12 +81,12 @@ class CalendarState extends ConsumerState<Calendar> {
             Container(
               padding: const EdgeInsets.fromLTRB(0, 5, 13, 5),
               child: Text(
-                DateFormat('yyyy年M月').format(DateTime(
-                    ref.read(foucusedDayProvider).year,
-                    ref.read(foucusedDayProvider).month + _monthDuration,
-                    1)),
-                style: const TextStyle(fontSize: 20.0, color: Colors.black),
-              ),
+                  DateFormat('yyyy年M月').format(DateTime(
+                      ref.read(foucusedDayProvider).year,
+                      ref.read(foucusedDayProvider).month + _monthDuration,
+                      1)),
+                  style: TextStyle(
+                      fontSize: 20.0, color: ref.read(blackProvider))),
             ),
             GestureDetector(
               child: Container(
@@ -118,7 +119,7 @@ class CalendarState extends ConsumerState<Calendar> {
       weekList.add(
         Expanded(
           child: Container(
-            decoration: BoxDecoration(color: Colors.grey.shade200),
+            decoration: BoxDecoration(color: ref.read(greyProvider)),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Text(
@@ -164,11 +165,10 @@ class CalendarState extends ConsumerState<Calendar> {
     for (int i = 1; i <= monthLastNumber; i++) {
       listCache.add(
         Expanded(
-          child: buildCalendarItem(
-              i,
-              DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
-              ref),
-        ),
+            child: buildCalendarItem(
+                i,
+                DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
+                ref)),
       );
 
       if (DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)
@@ -184,24 +184,20 @@ class CalendarState extends ConsumerState<Calendar> {
             listCache.insert(
                 0,
                 Expanded(
-                  child: buildCalendarItem(
-                      previousMonthLastNumber - j,
-                      DateTime(
-                          firstDayOfTheMonth.year,
-                          firstDayOfTheMonth.month - 1,
-                          previousMonthLastNumber - j),
-                      ref),
-                ));
+                    child: buildCalendarItem(
+                        previousMonthLastNumber - j,
+                        DateTime(
+                            firstDayOfTheMonth.year,
+                            firstDayOfTheMonth.month - 1,
+                            previousMonthLastNumber - j),
+                        ref)));
           } else {
-            listCache.add(
-              Expanded(
+            listCache.add(Expanded(
                 child: buildCalendarItem(
                     nextMonthFirstNumber + j,
                     DateTime(firstDayOfTheMonth.year,
                         firstDayOfTheMonth.month + 1, nextMonthFirstNumber + j),
-                    ref),
-              ),
-            );
+                    ref)));
           }
         }
 
@@ -242,7 +238,9 @@ class CalendarState extends ConsumerState<Calendar> {
           height: 30,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: (isToday) ? Colors.blue : Colors.transparent, //ここの色を変える。
+            color: (isToday)
+                ? ref.read(blueProvider)
+                : Colors.transparent, //ここの色を変える。
           ),
           child: GestureDetector(
             onTap: () {
@@ -254,8 +252,8 @@ class CalendarState extends ConsumerState<Calendar> {
               style: TextStyle(
                   fontSize: 14.0,
                   color: (isToday)
-                      ? ref.read(whiteColorProvider.notifier).state
-                      : Colors.black,
+                      ? ref.read(whiteColorProvider)
+                      : ref.read(blackProvider),
                   fontWeight: FontWeight.bold),
             ),
           ),
@@ -404,16 +402,13 @@ class CalendarState extends ConsumerState<Calendar> {
                           ),
                           IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const EventAddingPage()));
+                                Navigator.pushNamed(context, "/AddingPage");
                               },
                               icon: const Icon(Icons.add, color: Colors.blue)),
                         ]),
                   ),
                   content: SizedBox(
+                    height: MediaQuery.of(context).size.height,
                     width: MediaQuery.of(context).size.width,
                     child: const CalendarEventList(),
                   ),

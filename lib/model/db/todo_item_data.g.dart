@@ -8,31 +8,27 @@ part of 'todo_item_data.dart';
 
 // ignore_for_file: type=lint
 class TodoItemData extends DataClass implements Insertable<TodoItemData> {
-  final int id;
+  final String id;
   final String title;
   final String description;
-  final DateTime? startDate;
-  final DateTime? endDate;
+  final DateTime startDate;
+  final DateTime endDate;
   final bool shujitsuBool;
   const TodoItemData(
       {required this.id,
       required this.title,
       required this.description,
-      this.startDate,
-      this.endDate,
+      required this.startDate,
+      required this.endDate,
       required this.shujitsuBool});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
     map['description'] = Variable<String>(description);
-    if (!nullToAbsent || startDate != null) {
-      map['start_date'] = Variable<DateTime>(startDate);
-    }
-    if (!nullToAbsent || endDate != null) {
-      map['end_date'] = Variable<DateTime>(endDate);
-    }
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['end_date'] = Variable<DateTime>(endDate);
     map['shujitsu_bool'] = Variable<bool>(shujitsuBool);
     return map;
   }
@@ -42,12 +38,8 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
       id: Value(id),
       title: Value(title),
       description: Value(description),
-      startDate: startDate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(startDate),
-      endDate: endDate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(endDate),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
       shujitsuBool: Value(shujitsuBool),
     );
   }
@@ -56,11 +48,11 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TodoItemData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String>(json['description']),
-      startDate: serializer.fromJson<DateTime?>(json['startDate']),
-      endDate: serializer.fromJson<DateTime?>(json['endDate']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime>(json['endDate']),
       shujitsuBool: serializer.fromJson<bool>(json['shujitsuBool']),
     );
   }
@@ -68,28 +60,28 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String>(description),
-      'startDate': serializer.toJson<DateTime?>(startDate),
-      'endDate': serializer.toJson<DateTime?>(endDate),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime>(endDate),
       'shujitsuBool': serializer.toJson<bool>(shujitsuBool),
     };
   }
 
   TodoItemData copyWith(
-          {int? id,
+          {String? id,
           String? title,
           String? description,
-          Value<DateTime?> startDate = const Value.absent(),
-          Value<DateTime?> endDate = const Value.absent(),
+          DateTime? startDate,
+          DateTime? endDate,
           bool? shujitsuBool}) =>
       TodoItemData(
         id: id ?? this.id,
         title: title ?? this.title,
         description: description ?? this.description,
-        startDate: startDate.present ? startDate.value : this.startDate,
-        endDate: endDate.present ? endDate.value : this.endDate,
+        startDate: startDate ?? this.startDate,
+        endDate: endDate ?? this.endDate,
         shujitsuBool: shujitsuBool ?? this.shujitsuBool,
       );
   @override
@@ -121,11 +113,11 @@ class TodoItemData extends DataClass implements Insertable<TodoItemData> {
 }
 
 class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> title;
   final Value<String> description;
-  final Value<DateTime?> startDate;
-  final Value<DateTime?> endDate;
+  final Value<DateTime> startDate;
+  final Value<DateTime> endDate;
   final Value<bool> shujitsuBool;
   const TodoItemCompanion({
     this.id = const Value.absent(),
@@ -136,15 +128,17 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
     this.shujitsuBool = const Value.absent(),
   });
   TodoItemCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     this.title = const Value.absent(),
     this.description = const Value.absent(),
-    this.startDate = const Value.absent(),
-    this.endDate = const Value.absent(),
+    required DateTime startDate,
+    required DateTime endDate,
     this.shujitsuBool = const Value.absent(),
-  });
+  })  : id = Value(id),
+        startDate = Value(startDate),
+        endDate = Value(endDate);
   static Insertable<TodoItemData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? title,
     Expression<String>? description,
     Expression<DateTime>? startDate,
@@ -162,11 +156,11 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
   }
 
   TodoItemCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? title,
       Value<String>? description,
-      Value<DateTime?>? startDate,
-      Value<DateTime?>? endDate,
+      Value<DateTime>? startDate,
+      Value<DateTime>? endDate,
       Value<bool>? shujitsuBool}) {
     return TodoItemCompanion(
       id: id ?? this.id,
@@ -182,7 +176,7 @@ class TodoItemCompanion extends UpdateCompanion<TodoItemData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -224,11 +218,9 @@ class $TodoItemTable extends TodoItem
   $TodoItemTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
+      type: DriftSqlType.string, requiredDuringInsert: true);
   final VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title =
@@ -250,13 +242,13 @@ class $TodoItemTable extends TodoItem
   final VerificationMeta _startDateMeta = const VerificationMeta('startDate');
   @override
   late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
-      'start_date', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+      'start_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
   final VerificationMeta _endDateMeta = const VerificationMeta('endDate');
   @override
   late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
-      'end_date', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+      'end_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
   final VerificationMeta _shujitsuBoolMeta =
       const VerificationMeta('shujitsuBool');
   @override
@@ -280,6 +272,8 @@ class $TodoItemTable extends TodoItem
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -294,10 +288,14 @@ class $TodoItemTable extends TodoItem
     if (data.containsKey('start_date')) {
       context.handle(_startDateMeta,
           startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta));
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
     }
     if (data.containsKey('end_date')) {
       context.handle(_endDateMeta,
           endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta));
+    } else if (isInserting) {
+      context.missing(_endDateMeta);
     }
     if (data.containsKey('shujitsu_bool')) {
       context.handle(
@@ -315,15 +313,15 @@ class $TodoItemTable extends TodoItem
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TodoItemData(
       id: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       title: attachedDatabase.options.types
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       description: attachedDatabase.options.types
           .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
       startDate: attachedDatabase.options.types
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}start_date']),
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}start_date'])!,
       endDate: attachedDatabase.options.types
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}end_date']),
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}end_date'])!,
       shujitsuBool: attachedDatabase.options.types
           .read(DriftSqlType.bool, data['${effectivePrefix}shujitsu_bool'])!,
     );

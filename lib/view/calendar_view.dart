@@ -1,7 +1,6 @@
 import 'package:first_app/view/calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../view/calendar.dart';
 
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);

@@ -1,4 +1,5 @@
-import 'package:first_app/view/page/event_editing_page.dart';
+import 'package:first_app/view/eventAdding/EditingPage/event_adding_page.dart';
+import 'package:first_app/view/eventAdding/EditingPage/event_editing_page.dart';
 import 'package:first_app/view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -34,9 +35,10 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       routes: {
-        //"/home": (context) => const CalendarPage(),
+        "/home": (context) => const CalendarPage(),
         //"/EventList": (context) => const CalendarEventList(),
         "/EditingPage": (context) => const EventEditingPage(),
+        "/AddingPage": (context) => const EventAddingPage(),
       },
       home: const CalendarPage(),
     );

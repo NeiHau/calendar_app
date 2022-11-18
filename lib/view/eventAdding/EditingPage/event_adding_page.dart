@@ -1,10 +1,13 @@
+import 'package:first_app/model/db/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
-import 'package:first_app/view/calendar_view.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
+import 'package:first_app/view/calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 final startDayProvider = StateProvider((ref) => DateTime.now());
 final finishDayProvider = StateProvider((ref) => DateTime.now());
@@ -25,8 +28,11 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   DateTime endDate = DateTime.now();
   late FocusNode addTaskFocusNode;
   bool isAllDay = false;
-
-  Event temp = Event(); //frezzedで格納した値をインスタンス化
+  static var uuid = const Uuid(); // idを取得
+  Event temp = Event(
+      id: uuid.v1(),
+      startDate: DateTime.now(),
+      endDate: DateTime.now()); //frezzedで格納した値をインスタンス化
 
   @override
   void initState() {
@@ -40,10 +46,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final todoState = ref.watch(todoDatabaseProvider);
-    //final todoProvider = ref.watch(todoDatabaseProvider.notifier);
-    //List<TodoItemData> todoItems = todoProvider.state.todoItems;
-
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
@@ -60,10 +62,10 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              buildTitle(),
-              sizedBox(), // 余白を入れてあげる。
-              selectShujitsuDay(),
-              buildDescription(),
+              buildTitle(), // タイトル
+              sizedBox(), // 余白
+              selectShujitsuDay(), // 開始日・終了日
+              buildDescription(), // コメント
             ],
           ),
         ),
@@ -71,27 +73,38 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
     );
   }
 
+  // 「保存」ボタンを表示させるためのメソッド。
   List<Widget> buildEditingActions() => [
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 5, 10),
           child: TextButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CalendarPage()));
-
+              TodoItemData data = TodoItemData(
+                id: uuid.v1(),
+                title: temp.title,
+                description: temp.description,
+                startDate: temp.startDate,
+                endDate: temp.endDate,
+                shujitsuBool: temp.isAllDay,
+              );
+              // 'todoprovider'でProviderのメソッドや値を取得。
               final todoProvider = ref.watch(todoDatabaseProvider.notifier);
-              todoProvider.writeData(temp);
+              todoProvider.writeData(data);
+
+              final saveProvider = ref.watch(eventStateProvider.notifier);
+              saveProvider.readDataMap();
+
+              Navigator.pushNamed(context, "/home");
             },
             style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.white)),
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    ref.read(whiteColorProvider))),
             child: const Text('保存'),
           ),
         )
       ];
 
+  // タイトルに入力をするためのメソッド。
   Widget buildTitle() => Card(
         child: Container(
           padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
@@ -102,17 +115,17 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
               style:
                   const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
               decoration: const InputDecoration(
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                border: UnderlineInputBorder(),
-                hintText: 'タイトルを入力してください',
-              ),
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  border: UnderlineInputBorder(),
+                  hintText: 'タイトルを入力してください'),
               onFieldSubmitted: (value) {
                 temp = temp.copyWith(title: value);
               }),
         ),
       );
 
+  // 開始日、終了日を入力するためのメソッド。
   Card selectShujitsuDay() {
     return Card(
       child: Column(
@@ -144,7 +157,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     startDate.month,
                     startDate.day,
                     startDate.hour,
-                    //startDate.minute, // 見直し。エラー起きた。
                   ),
                 ));
               },
@@ -155,14 +167,14 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
               child: Text(isAllDay
-                  ? DateFormat('yyyy-MM-dd').format(startDate)
-                  : DateFormat('yyyy-MM-dd HH:mm').format(startDate)),
+                  ? DateFormat('yyyy-MM-dd').format(endDate)
+                  : DateFormat('yyyy-MM-dd HH:mm').format(endDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(endDate: value);
                     setState(() {
-                      startDate = value;
+                      endDate = value;
                     });
                   },
                   mode: CupertinoDatePickerMode.dateAndTime,
@@ -172,7 +184,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     endDate.month,
                     endDate.day,
                     endDate.hour,
-                    //startDate.minute,  // 見直し。エラー起きた。
                   ),
                 ));
               },
@@ -212,9 +223,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             hintText: 'コメントを入力してください',
           ),
           maxLines: 8,
-          onFieldSubmitted: (value) {
-            temp = temp.copyWith(description: value);
-          },
         ),
       ),
     );
@@ -279,9 +287,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   // 余白を作るためのメソッド。
   Widget sizedBox() {
-    return const SizedBox(
-      height: 25,
-      width: 10,
-    );
+    return const SizedBox(height: 25, width: 10);
   }
 }
