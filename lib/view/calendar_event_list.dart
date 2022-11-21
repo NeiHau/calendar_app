@@ -1,10 +1,8 @@
-import 'package:first_app/component/color.dart';
-import 'package:first_app/model/db/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
-import 'package:first_app/view/calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class CalendarEventList extends ConsumerStatefulWidget {
   const CalendarEventList({super.key});
@@ -18,15 +16,17 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
 
   @override
   Widget build(BuildContext context) {
-    final todoProvider = ref.watch(todoDatabaseProvider.notifier);
-    List<Event> todoItems = todoProvider.state.todoItems.cast<Event>();
+    final state = ref.watch(todoDatabaseProvider); // stateとnotifierは別で管理。
+    List<Event> todoItems = state.todoItems;
 
-    // tile全てを格納するリスト
-    List<Widget> tiles = buildTodoList(todoItems, todoProvider);
+    //final Event arg = ModalRoute.of(context)?.settings.arguments as Event;
+
+    // 全てのtileを格納するリスト
+    List<Widget> tiles = buildTodoList(todoItems);
 
     return Scaffold(
       body: Container(
-        color: ref.read(whiteColorProvider),
+        color: Colors.white,
         child: (list.isEmpty)
             ? const Center(
                 child: Text('予定がありません'),
@@ -37,45 +37,55 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
   }
 
   // 予定追加画面において、todoリストを作成するメソッド。
-  List<Widget> buildTodoList(
-      List<Event> todoItemList, TodoDatabaseNotifier db) {
+  List<Widget> buildTodoList(List<Event> todoItemList) {
+    //var isAllday = data.isAllDay;
+    bool isAllday = false; // とりあえず、初期値をここで入れておく。
     for (Event item in todoItemList) {
-      bool isAllday = (item.isAllDay == false);
       Widget tile = Container(
         decoration: BoxDecoration(
             border: Border(
           bottom: BorderSide(
             width: 0,
-            color: ref.read(greyProvider),
+            color: Colors.grey[200]!,
           ),
         )),
         child: GestureDetector(
           onTap: () =>
               Navigator.pushNamed(context, "/EditingPage", arguments: item),
           child: ListTile(
-            tileColor: ref.read(whiteColorProvider),
+            tileColor: Colors.white,
 
-            // ここ分からない。
+            // ここが分からない。終日かどうかを判定したい。
+            // 追加画面で得た終日チェックのデータを持ってきたい。
             leading: (isAllday)
                 ? const Text('終日')
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(item.startDate.hour.toString()),
-                      Text(item.endDate.hour.toString()),
+                      Text(DateFormat('HH:mm').format(item.startDate)),
+                      Text(DateFormat('HH:mm').format(item.endDate)),
                     ],
                   ),
             title: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const VerticalDivider(
+                Container(
                   color: Colors.blue,
-                  thickness: 4,
+                  child: const VerticalDivider(
+                    color: Colors.blue,
+                    thickness: 1,
+                    indent: 50,
+                    width: 4,
+                  ),
+                ),
+                const SizedBox(
+                  width: 12,
                 ),
                 Title(
-                  color: ref.read(blackProvider),
+                  color: Colors.black,
                   child: Text(
                     item.title,
-                    textAlign: TextAlign.start,
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],

@@ -30,13 +30,20 @@ class TodoItem extends Table {
 
 @DriftDatabase(tables: [TodoItem])
 class MyDatabase extends _$MyDatabase {
+  DateTime selectedDate = DateTime.now();
+
   MyDatabase() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
 
-  // 全てのデータ取得
+  // 全てのデータ取得。でも、これだと全ての日付に予定が追加されてしまう。
   Future<List<TodoItemData>> readAllTodoData() => select(todoItem).get();
+
+  // 選択された日付と同じ日付のデータを取得したい。
+  Future<List<TodoItemData>> readTodoData(DateTime data) =>
+      (select(todoItem)..where((it) => it.startDate.equals(selectedDate)))
+          .get();
 
   // 追加
   Future writeTodo(TodoItemCompanion data) => into(todoItem).insert(data);

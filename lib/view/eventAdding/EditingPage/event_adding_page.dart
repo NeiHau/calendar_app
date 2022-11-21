@@ -1,8 +1,7 @@
-import 'package:first_app/model/db/todo_item_data.dart';
+import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
+import 'package:first_app/model/freezed/event_list.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
-import 'package:first_app/state_notifier/event_map_provider.dart';
-import 'package:first_app/view/calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,10 +28,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   late FocusNode addTaskFocusNode;
   bool isAllDay = false;
   static var uuid = const Uuid(); // idを取得
+
   Event temp = Event(
       id: uuid.v1(),
       startDate: DateTime.now(),
       endDate: DateTime.now()); //frezzedで格納した値をインスタンス化
+  TodoEventList updated = TodoEventList(isUpdated: false);
 
   @override
   void initState() {
@@ -46,6 +47,8 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   @override
   Widget build(BuildContext context) {
+    //final Event arg = ModalRoute.of(context)?.settings.arguments as Event;
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
@@ -62,10 +65,10 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              buildTitle(), // タイトル
-              sizedBox(), // 余白
-              selectShujitsuDay(), // 開始日・終了日
-              buildDescription(), // コメント
+              buildTitle(), // タイトルを入力
+              sizedBox(), // 余白を生成する
+              selectShujitsuDay(), // 開始日・終了日を選択
+              buildDescription(), // コメントを入力
             ],
           ),
         ),
@@ -78,9 +81,34 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 5, 10),
           child: TextButton(
-            onPressed: () {
+            onPressed: (updated.isUpdated == false)
+                ? null
+                : () {
+                    TodoItemData data = TodoItemData(
+                      id: temp.id,
+                      title: temp.title,
+                      description: temp.description,
+                      startDate: temp.startDate,
+                      endDate: temp.endDate,
+                      shujitsuBool: temp.isAllDay,
+                    );
+                    // 'todoprovider'でProviderのメソッドや値を取得。
+                    final todoProvider =
+                        ref.watch(todoDatabaseProvider.notifier);
+                    todoProvider.updateData(data);
+
+                    /*ここでMap型として情報を格納したい。
+                    final saveProvider = ref.watch(eventStateProvider.notifier);
+                    saveProvider.readDataMap();
+                    */
+
+                    Navigator.of(context).pop();
+                  },
+
+            /*
+            () {
               TodoItemData data = TodoItemData(
-                id: uuid.v1(),
+                id: uuid.v1(), // idの宣言がこれでいいのかが分からない。
                 title: temp.title,
                 description: temp.description,
                 startDate: temp.startDate,
@@ -91,14 +119,18 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
               final todoProvider = ref.watch(todoDatabaseProvider.notifier);
               todoProvider.writeData(data);
 
+              /*
               final saveProvider = ref.watch(eventStateProvider.notifier);
               saveProvider.readDataMap();
+              */
 
               Navigator.pushNamed(context, "/home");
             },
+            */
+
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    ref.read(whiteColorProvider))),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.white)),
             child: const Text('保存'),
           ),
         )
@@ -120,7 +152,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                   border: UnderlineInputBorder(),
                   hintText: 'タイトルを入力してください'),
               onFieldSubmitted: (value) {
-                temp = temp.copyWith(title: value);
+                updated = updated.copyWith(isUpdated: true);
               }),
         ),
       );
@@ -146,11 +178,15 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(startDate: value);
+                    updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       startDate = value;
                     });
                   },
-                  mode: CupertinoDatePickerMode.dateAndTime,
+                  use24hFormat: true,
+                  mode: isAllDay
+                      ? CupertinoDatePickerMode.date
+                      : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
                   initialDateTime: DateTime(
                     startDate.year,
@@ -166,18 +202,22 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             title: const Text('終了'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text(isAllDay
+              child: Text((isAllDay == true)
                   ? DateFormat('yyyy-MM-dd').format(endDate)
                   : DateFormat('yyyy-MM-dd HH:mm').format(endDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(endDate: value);
+                    updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       endDate = value;
                     });
                   },
-                  mode: CupertinoDatePickerMode.dateAndTime,
+                  use24hFormat: true,
+                  mode: isAllDay
+                      ? CupertinoDatePickerMode.date
+                      : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
                   initialDateTime: DateTime(
                     endDate.year,
@@ -197,11 +237,14 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   // 終日スイッチ
   Switch createSwitch(int index) {
     return Switch(
-      value: isAllDay,
+      value: temp.isAllDay,
       onChanged: (value) {
         setState(() {
           isAllDay = value;
         });
+        temp = temp.copyWith(isAllDay: value);
+        updated = updated.copyWith(isUpdated: true);
+        print(isAllDay);
       },
     );
   }
@@ -214,6 +257,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         child: TextFormField(
           onChanged: (value) {
             temp = temp.copyWith(description: value);
+          },
+          onFieldSubmitted: (value) {
+            updated = updated.copyWith(isUpdated: true);
           },
           style: const TextStyle(fontSize: 12),
           decoration: const InputDecoration(
@@ -254,21 +300,26 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                         TextButton(
                             onPressed: () {
                               final isEndTimeBefore =
-                                  startDate.isBefore(startDate);
-                              final isEqual =
-                                  startDate.microsecondsSinceEpoch ==
-                                      startDate.millisecondsSinceEpoch;
+                                  endDate.isBefore(startDate);
+                              final isStartTimeAfter =
+                                  startDate.isAfter(endDate);
+                              final isEqual = endDate.microsecondsSinceEpoch ==
+                                  startDate.millisecondsSinceEpoch;
 
                               if (isAllDay) {
                                 if (isEndTimeBefore || isEqual) {
                                   setState(() {
-                                    startDate = startDate;
+                                    endDate = startDate;
+                                  });
+                                } else if (isStartTimeAfter) {
+                                  setState(() {
+                                    endDate = startDate;
                                   });
                                 }
                               } else {
                                 if (isEndTimeBefore || isEqual) {
                                   setState(() {
-                                    startDate =
+                                    endDate =
                                         startDate.add(const Duration(hours: 1));
                                   });
                                 }

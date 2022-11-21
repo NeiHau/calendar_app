@@ -8,5 +8,6 @@ class TodoEventList with _$TodoEventList {
   // データベースの状態を管理するクラス。
   factory TodoEventList({
     @Default([]) List<Event> todoItems,
+    @Default(false) bool isUpdated,
   }) = _TodoEventList;
 }

@@ -1,5 +1,4 @@
 import 'package:first_app/component/color.dart';
-import 'package:first_app/view/eventAdding/EditingPage/event_adding_page.dart';
 import 'package:first_app/view/calendar_event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,7 +8,7 @@ import 'package:month_year_picker/month_year_picker.dart';
 final weekDayProvider = StateProvider(((ref) => 7));
 final foucusedDayProvider = StateProvider(((ref) => DateTime.now()));
 final cacheDateProvider = StateProvider(((ref) => DateTime.now()));
-final whiteColorProvider = StateProvider(((ref) => Colors.white));
+//final whiteColorProvider = StateProvider(((ref) => Colors.white));
 
 class Calendar extends ConsumerStatefulWidget {
   final Color? color;
@@ -51,10 +50,10 @@ class CalendarState extends ConsumerState<Calendar> {
     );
   }
 
-  // 今月のカレンダー画面で表示させたい機能('今日ボタン', '年月', 'MonthYearPicker')を含むメソッド
+  // 今月のカレンダー画面で表示させたい機能('今日ボタン','年月','MonthYearPicker')を含むメソッド
   Container currentMonth(WidgetRef ref) {
     return Container(
-      color: ref.read(whiteColorProvider),
+      color: Colors.white,
       height: 45,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -63,10 +62,12 @@ class CalendarState extends ConsumerState<Calendar> {
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: ref.read(blackProvider),
-                    backgroundColor: ref.read(whiteColorProvider),
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.white,
                     shape: const StadiumBorder()),
                 onPressed: () {
+                  // なぜか２回押さないと、今日の日付に遷移しない。１回で遷移させたい。
+                  // １回タップすると、月の最初の日に遷移。
                   widget.calendarController.animateToPage(
                       widget.calendarController.initialPage,
                       duration: const Duration(milliseconds: 5),
@@ -85,8 +86,7 @@ class CalendarState extends ConsumerState<Calendar> {
                       ref.read(foucusedDayProvider).year,
                       ref.read(foucusedDayProvider).month + _monthDuration,
                       1)),
-                  style: TextStyle(
-                      fontSize: 20.0, color: ref.read(blackProvider))),
+                  style: const TextStyle(fontSize: 20.0, color: Colors.black)),
             ),
             GestureDetector(
               child: Container(
@@ -170,7 +170,6 @@ class CalendarState extends ConsumerState<Calendar> {
                 DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
                 ref)),
       );
-
       if (DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)
                   .weekday ==
               newLineNumber(startNumber: ref.read(weekDayProvider) + 1) ||
@@ -200,14 +199,12 @@ class CalendarState extends ConsumerState<Calendar> {
                     ref)));
           }
         }
-
         list.add(Row(
           children: listCache,
         ));
         listCache = [];
       }
     }
-
     return Column(
       children: list,
     );
@@ -236,11 +233,9 @@ class CalendarState extends ConsumerState<Calendar> {
           alignment: Alignment.center,
           width: 30,
           height: 30,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: (isToday)
-                ? ref.read(blueProvider)
-                : Colors.transparent, //ここの色を変える。
+            color: Colors.blue, //ここの色を変える。
           ),
           child: GestureDetector(
             onTap: () {
@@ -251,9 +246,7 @@ class CalendarState extends ConsumerState<Calendar> {
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 14.0,
-                  color: (isToday)
-                      ? ref.read(whiteColorProvider)
-                      : ref.read(blackProvider),
+                  color: (isToday) ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold),
             ),
           ),
@@ -269,9 +262,9 @@ class CalendarState extends ConsumerState<Calendar> {
           alignment: Alignment.center,
           width: 30,
           height: 30,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: (isToday) ? Colors.blue : Colors.transparent,
+            color: Colors.transparent,
           ),
           child: GestureDetector(
             onTap: () {
@@ -282,7 +275,7 @@ class CalendarState extends ConsumerState<Calendar> {
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 14.0,
-                  color: (isToday) ? Colors.white : Colors.blueGrey[100],
+                  color: Colors.blueGrey[100],
                   fontWeight: FontWeight.bold),
             ),
           ),
@@ -320,7 +313,7 @@ class CalendarState extends ConsumerState<Calendar> {
     const defaultTextColor = Colors.black87;
 
     if (day.weekday == DateTime.sunday) {
-      return Colors.red;
+      return ref.read(redProvider);
     }
     if (day.weekday == DateTime.saturday) {
       return Colors.blue[600]!;

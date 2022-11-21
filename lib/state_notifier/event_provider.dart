@@ -1,4 +1,4 @@
-import 'package:first_app/model/db/todo_item_data.dart';
+import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -7,16 +7,20 @@ import 'package:drift/drift.dart';
 final startDateProvider = StateProvider(((ref) => DateTime.now()));
 final endDateProvider = StateProvider(((ref) => DateTime.now));
 
-final todoDatabaseProvider = StateNotifierProvider((_) {
-  return TodoDatabaseNotifier();
+final todoDatabaseProvider =
+    StateNotifierProvider<TodoDatabaseNotifier, TodoEventList>((ref) {
+  return TodoDatabaseNotifier(ref);
 });
 
 // データベースの状態が変わるたびTodoのviewをビルドするようにするクラス。
 class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
-  TodoDatabaseNotifier() : super(TodoEventList());
+  TodoDatabaseNotifier(this.ref) : super(TodoEventList()) {
+    readData(); // ここで最初にデータを読み込んであげる。
+  }
 
-  // これ以降、データベースに関する処理をこのクラスで行えるように記述する。
+  final Ref ref;
   final _db = MyDatabase();
+
   // 書き込み処理部分
   Future writeData(TodoItemData data) async {
     if (data.title.isEmpty) {
@@ -41,7 +45,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // 削除処理部分
   Future deleteData(Event data) async {
-    state = state.copyWith();
+    //state = state.copyWith();
     await _db.deleteTodo(data);
 
     // 削除するたびにデータベースを読み込む。
@@ -50,9 +54,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // 更新処理部分
   Future updateData(TodoItemData data) async {
-    if (data.title.isEmpty) {
-      return;
-    }
     await _db.updateTodo(data);
 
     // 更新するたびにデータベースを読み込む。
@@ -61,6 +62,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // データ読み込み処理
   Future readData() async {
+    //final todoItems = await _db.readTodoData(temp.startDate);
     final todoItems = await _db.readAllTodoData();
 
     print(todoItems);
@@ -75,7 +77,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
           endDate: todoItems[i].endDate,
           isAllDay: todoItems[i].shujitsuBool));
     }
-
     state = state.copyWith(
       todoItems: todoList,
     );

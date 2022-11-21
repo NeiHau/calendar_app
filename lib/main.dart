@@ -1,3 +1,4 @@
+import 'package:first_app/view/calendar_event_list.dart';
 import 'package:first_app/view/eventAdding/EditingPage/event_adding_page.dart';
 import 'package:first_app/view/eventAdding/EditingPage/event_editing_page.dart';
 import 'package:first_app/view/calendar_view.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         "/home": (context) => const CalendarPage(),
-        //"/EventList": (context) => const CalendarEventList(),
+        "/EventList": (context) => const CalendarEventList(),
         "/EditingPage": (context) => const EventEditingPage(),
         "/AddingPage": (context) => const EventAddingPage(),
       },

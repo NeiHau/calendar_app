@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$TodoEventList {
   List<Event> get todoItems => throw _privateConstructorUsedError;
+  bool get isUpdated => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $TodoEventListCopyWith<TodoEventList> get copyWith =>
@@ -29,7 +30,7 @@ abstract class $TodoEventListCopyWith<$Res> {
           TodoEventList value, $Res Function(TodoEventList) then) =
       _$TodoEventListCopyWithImpl<$Res, TodoEventList>;
   @useResult
-  $Res call({List<Event> todoItems});
+  $Res call({List<Event> todoItems, bool isUpdated});
 }
 
 /// @nodoc
@@ -46,12 +47,17 @@ class _$TodoEventListCopyWithImpl<$Res, $Val extends TodoEventList>
   @override
   $Res call({
     Object? todoItems = null,
+    Object? isUpdated = null,
   }) {
     return _then(_value.copyWith(
       todoItems: null == todoItems
           ? _value.todoItems
           : todoItems // ignore: cast_nullable_to_non_nullable
               as List<Event>,
+      isUpdated: null == isUpdated
+          ? _value.isUpdated
+          : isUpdated // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -64,7 +70,7 @@ abstract class _$$_TodoEventListCopyWith<$Res>
       __$$_TodoEventListCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<Event> todoItems});
+  $Res call({List<Event> todoItems, bool isUpdated});
 }
 
 /// @nodoc
@@ -79,12 +85,17 @@ class __$$_TodoEventListCopyWithImpl<$Res>
   @override
   $Res call({
     Object? todoItems = null,
+    Object? isUpdated = null,
   }) {
     return _then(_$_TodoEventList(
       todoItems: null == todoItems
           ? _value._todoItems
           : todoItems // ignore: cast_nullable_to_non_nullable
               as List<Event>,
+      isUpdated: null == isUpdated
+          ? _value.isUpdated
+          : isUpdated // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -92,7 +103,8 @@ class __$$_TodoEventListCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_TodoEventList implements _TodoEventList {
-  _$_TodoEventList({final List<Event> todoItems = const []})
+  _$_TodoEventList(
+      {final List<Event> todoItems = const [], this.isUpdated = false})
       : _todoItems = todoItems;
 
   final List<Event> _todoItems;
@@ -104,8 +116,12 @@ class _$_TodoEventList implements _TodoEventList {
   }
 
   @override
+  @JsonKey()
+  final bool isUpdated;
+
+  @override
   String toString() {
-    return 'TodoEventList(todoItems: $todoItems)';
+    return 'TodoEventList(todoItems: $todoItems, isUpdated: $isUpdated)';
   }
 
   @override
@@ -114,12 +130,14 @@ class _$_TodoEventList implements _TodoEventList {
         (other.runtimeType == runtimeType &&
             other is _$_TodoEventList &&
             const DeepCollectionEquality()
-                .equals(other._todoItems, _todoItems));
+                .equals(other._todoItems, _todoItems) &&
+            (identical(other.isUpdated, isUpdated) ||
+                other.isUpdated == isUpdated));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_todoItems));
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_todoItems), isUpdated);
 
   @JsonKey(ignore: true)
   @override
@@ -129,10 +147,13 @@ class _$_TodoEventList implements _TodoEventList {
 }
 
 abstract class _TodoEventList implements TodoEventList {
-  factory _TodoEventList({final List<Event> todoItems}) = _$_TodoEventList;
+  factory _TodoEventList({final List<Event> todoItems, final bool isUpdated}) =
+      _$_TodoEventList;
 
   @override
   List<Event> get todoItems;
+  @override
+  bool get isUpdated;
   @override
   @JsonKey(ignore: true)
   _$$_TodoEventListCopyWith<_$_TodoEventList> get copyWith =>
