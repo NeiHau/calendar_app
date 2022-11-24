@@ -23,9 +23,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // 書き込み処理部分
   Future writeData(TodoItemData data) async {
-    if (data.title.isEmpty) {
-      return;
-    }
     TodoItemCompanion entry = TodoItemCompanion(
       id: Value(data.id),
       title: Value(data.title),
@@ -35,21 +32,18 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
       shujitsuBool: Value(data.shujitsuBool),
     );
 
-    print(entry);
-
     await _db.writeTodo(entry);
 
     // 書き込むたびにデータベースを読み込む。
-    await readData();
+    readData();
   }
 
   // 削除処理部分
   Future deleteData(Event data) async {
-    //state = state.copyWith();
     await _db.deleteTodo(data);
 
     // 削除するたびにデータベースを読み込む。
-    await readData();
+    readData();
   }
 
   // 更新処理部分
@@ -57,7 +51,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
     await _db.updateTodo(data);
 
     // 更新するたびにデータベースを読み込む。
-    await readData();
+    readData();
   }
 
   // データ読み込み処理

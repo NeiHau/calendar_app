@@ -1,6 +1,7 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -97,39 +98,13 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                         ref.watch(todoDatabaseProvider.notifier);
                     todoProvider.updateData(data);
 
-                    /*ここでMap型として情報を格納したい。
+                    /*
                     final saveProvider = ref.watch(eventStateProvider.notifier);
                     saveProvider.readDataMap();
                     */
 
                     Navigator.of(context).pop();
                   },
-
-            /*
-            (updated.isUpdated == false)
-                ? null
-                : () {
-                    TodoItemData data = TodoItemData(
-                      id: temp.id,
-                      title: temp.title,
-                      description: temp.description,
-                      startDate: temp.startDate,
-                      endDate: temp.endDate,
-                      shujitsuBool: temp.isAllDay,
-                    );
-                    // 'todoprovider'でProviderのメソッドや値を取得。
-                    final todoProvider =
-                        ref.watch(todoDatabaseProvider.notifier);
-                    todoProvider.updateData(data);
-
-                    /*ここでMap型として情報を格納したい。
-                    final saveProvider = ref.watch(eventStateProvider.notifier);
-                    saveProvider.readDataMap();
-                    */
-
-                    Navigator.of(context).pop();
-                  },
-            */
             style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all<Color>(Colors.white)),
@@ -146,7 +121,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             initialValue: data.title,
             onChanged: (value) {
               temp = data.copyWith(title: value);
-              updated = updated.copyWith(isUpdated: true);
+              setState(() {
+                updated = updated.copyWith(isUpdated: true);
+              });
               print(updated);
             },
             style: const TextStyle(fontSize: 12),
@@ -156,9 +133,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               border: UnderlineInputBorder(),
               hintText: 'タイトルを入力してください',
             ),
-            onFieldSubmitted: (_) {
-              updated = updated.copyWith(isUpdated: true);
-            },
           ),
         ),
       );
@@ -184,7 +158,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = data.copyWith(startDate: value);
-                    updated = updated.copyWith(isUpdated: true);
+                    setState(() {
+                      updated = updated.copyWith(isUpdated: true);
+                    });
                   },
                   mode: isAllDay
                       ? CupertinoDatePickerMode.date
@@ -211,7 +187,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = data.copyWith(endDate: value);
-                    updated = updated.copyWith(isUpdated: true);
+                    setState(() {
+                      updated = updated.copyWith(isUpdated: true);
+                    });
                   },
                   mode: isAllDay
                       ? CupertinoDatePickerMode.date
@@ -239,9 +217,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
       onChanged: (value) {
         setState(() {
           isAllDay = value;
+          updated = updated.copyWith(isUpdated: true);
         });
         temp = temp.copyWith(isAllDay: value);
-        //updated = updated.copyWith(isUpdated: true);
       },
     );
   }
@@ -263,9 +241,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
           maxLines: 8,
           onChanged: (value) {
             temp = data.copyWith(description: value);
-          },
-          onFieldSubmitted: (_) {
-            updated = updated.copyWith(isUpdated: true);
+            setState(() {
+              updated = updated.copyWith(isUpdated: true);
+            });
           },
         ),
       ),

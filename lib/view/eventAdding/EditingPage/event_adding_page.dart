@@ -1,6 +1,7 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,8 +48,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final Event arg = ModalRoute.of(context)?.settings.arguments as Event;
-
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
@@ -81,7 +80,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 5, 10),
           child: TextButton(
-            onPressed: (updated.isUpdated == false)
+            onPressed: (updated.isUpdated == false && temp.title == '')
                 ? null
                 : () {
                     TodoItemData data = TodoItemData(
@@ -95,39 +94,15 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     // 'todoprovider'でProviderのメソッドや値を取得。
                     final todoProvider =
                         ref.watch(todoDatabaseProvider.notifier);
-                    todoProvider.updateData(data);
+                    todoProvider.writeData(data);
 
-                    /*ここでMap型として情報を格納したい。
+                    /*
                     final saveProvider = ref.watch(eventStateProvider.notifier);
                     saveProvider.readDataMap();
                     */
 
                     Navigator.of(context).pop();
                   },
-
-            /*
-            () {
-              TodoItemData data = TodoItemData(
-                id: uuid.v1(), // idの宣言がこれでいいのかが分からない。
-                title: temp.title,
-                description: temp.description,
-                startDate: temp.startDate,
-                endDate: temp.endDate,
-                shujitsuBool: temp.isAllDay,
-              );
-              // 'todoprovider'でProviderのメソッドや値を取得。
-              final todoProvider = ref.watch(todoDatabaseProvider.notifier);
-              todoProvider.writeData(data);
-
-              /*
-              final saveProvider = ref.watch(eventStateProvider.notifier);
-              saveProvider.readDataMap();
-              */
-
-              Navigator.pushNamed(context, "/home");
-            },
-            */
-
             style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all<Color>(Colors.white)),
@@ -139,10 +114,13 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   // タイトルに入力をするためのメソッド。
   Widget buildTitle() => Card(
         child: Container(
-          padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
-          child: TextFormField(
+            padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
+            child: TextFormField(
               onChanged: (value) {
                 temp = temp.copyWith(title: value);
+                setState(() {
+                  updated = updated.copyWith(isUpdated: true);
+                });
               },
               style:
                   const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
@@ -151,10 +129,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                   focusedBorder: InputBorder.none,
                   border: UnderlineInputBorder(),
                   hintText: 'タイトルを入力してください'),
-              onFieldSubmitted: (value) {
-                updated = updated.copyWith(isUpdated: true);
-              }),
-        ),
+            )),
       );
 
   // 開始日、終了日を入力するためのメソッド。
@@ -181,6 +156,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       startDate = value;
+                      updated = updated.copyWith(isUpdated: true);
                     });
                   },
                   use24hFormat: true,
@@ -212,6 +188,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       endDate = value;
+                      updated = updated.copyWith(isUpdated: true);
                     });
                   },
                   use24hFormat: true,
@@ -241,6 +218,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
       onChanged: (value) {
         setState(() {
           isAllDay = value;
+          updated = updated.copyWith(isUpdated: true);
         });
         temp = temp.copyWith(isAllDay: value);
         updated = updated.copyWith(isUpdated: true);
@@ -257,9 +235,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         child: TextFormField(
           onChanged: (value) {
             temp = temp.copyWith(description: value);
-          },
-          onFieldSubmitted: (value) {
-            updated = updated.copyWith(isUpdated: true);
+            setState(() {
+              updated = updated.copyWith(isUpdated: true);
+            });
           },
           style: const TextStyle(fontSize: 12),
           decoration: const InputDecoration(

@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final eventStateProvider =
     StateNotifierProvider.family<EventStateNotifier, TodoStateData, Event>(
-        (ref, temp) => EventStateNotifier(ref, temp));
+        (ref, temp) {
+  return EventStateNotifier(ref, temp);
+});
 
 class EventStateNotifier extends StateNotifier<TodoStateData> {
   EventStateNotifier(this.ref, this.temp) : super(TodoStateData());
