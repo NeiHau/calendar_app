@@ -40,8 +40,6 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
       );
     }
 
-    print(todoList);
-
     for (final e in todoList) {
       final startDay =
           DateTime(e.startDate.year, e.startDate.month, e.startDate.day);

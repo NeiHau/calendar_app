@@ -3,6 +3,7 @@ import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 
 final startDateProvider = StateProvider(((ref) => DateTime.now()));
 final endDateProvider = StateProvider(((ref) => DateTime.now));
@@ -59,8 +60,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // データ読み込み処理
   Future readData() async {
-    //final todoItems = await _db.readTodoData(temp.startDate);
-
     final todoItems = await _db.readAllTodoData();
 
     print(todoItems);
@@ -75,6 +74,8 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
           endDate: todoItems[i].endDate,
           isAllDay: todoItems[i].shujitsuBool));
     }
+
+    print(todoList);
     state = state.copyWith(
       todoItems: todoList,
     );

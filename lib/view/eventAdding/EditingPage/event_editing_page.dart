@@ -102,7 +102,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     saveProvider.readDataMap();
                     */
 
-                    Navigator.pushNamed(context, "/home");
+                    Navigator.of(context).pop();
                   },
             style: ButtonStyle(
                 backgroundColor:

@@ -42,9 +42,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                   final distance = initialPage - value;
                   return DateTime(now.year, now.month - distance);
                 });
-                setState(() {
-                  //now = DateTime(now.year, now.month, now.day);
-                });
+                setState(() {});
               },
             ),
           ),

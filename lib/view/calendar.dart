@@ -1,5 +1,4 @@
 import 'package:first_app/component/color.dart';
-import 'package:first_app/view/calendar_event_list.dart';
 import 'package:first_app/view/calendar_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +8,7 @@ import 'package:month_year_picker/month_year_picker.dart';
 final weekDayProvider = StateProvider(((ref) => 7));
 final foucusedDayProvider = StateProvider(((ref) => DateTime.now()));
 final cacheDateProvider = StateProvider(((ref) => DateTime.now()));
+final todayProvider = StateProvider(((ref) => DateTime.now()));
 
 class Calendar extends ConsumerStatefulWidget {
   final Color? color;
@@ -70,7 +70,7 @@ class CalendarState extends ConsumerState<Calendar> {
                   // １回タップすると、月の最初の日に遷移。
                   widget.calendarController.animateToPage(
                       widget.calendarController.initialPage,
-                      duration: const Duration(milliseconds: 5),
+                      duration: const Duration(milliseconds: 2),
                       curve: Curves.ease);
                   setState(() {
                     selectedDate = DateTime.now();
@@ -98,9 +98,7 @@ class CalendarState extends ConsumerState<Calendar> {
                 ),
               ),
               onTap: () {
-                setState(() {
-                  selectDate(context: context, locale: 'ja');
-                });
+                setState(() {});
               },
             )
           ]),
@@ -241,7 +239,7 @@ class CalendarState extends ConsumerState<Calendar> {
           height: 30,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.blue, //ここの色を変える。
+            color: Colors.blue,
           ),
           child: GestureDetector(
             onTap: () {
@@ -309,7 +307,6 @@ class CalendarState extends ConsumerState<Calendar> {
       ),
       onTap: () {
         createTask();
-        setState(() {});
       },
     );
   }
