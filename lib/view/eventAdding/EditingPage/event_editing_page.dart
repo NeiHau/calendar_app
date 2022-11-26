@@ -1,7 +1,6 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
-import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +102,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     saveProvider.readDataMap();
                     */
 
-                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, "/home");
                   },
             style: ButtonStyle(
                 backgroundColor:
@@ -124,7 +123,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               setState(() {
                 updated = updated.copyWith(isUpdated: true);
               });
-              print(updated);
             },
             style: const TextStyle(fontSize: 12),
             decoration: const InputDecoration(

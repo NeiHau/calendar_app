@@ -3,21 +3,25 @@ import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_state_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// final eventStateProvider =
+//     StateNotifierProvider.family<EventStateNotifier, TodoStateData, Event>(
+//         (ref, temp) {
+//   return EventStateNotifier(ref, temp);
+// });
 final eventStateProvider =
-    StateNotifierProvider.family<EventStateNotifier, TodoStateData, Event>(
-        (ref, temp) {
-  return EventStateNotifier(ref, temp);
+    StateNotifierProvider<EventStateNotifier, TodoStateData>((ref) {
+  return EventStateNotifier(ref);
 });
 
 class EventStateNotifier extends StateNotifier<TodoStateData> {
-  EventStateNotifier(this.ref, this.temp) : super(TodoStateData());
+  EventStateNotifier(this.ref) : super(TodoStateData());
 
   final Ref ref;
   MyDatabase database = MyDatabase();
-  final Event temp;
+  //final Event temp;
 
   Future readDataMap() async {
-    final eventsAll = await database.readTodoData(temp.startDate);
+    final eventsAll = await database.readAllTodoData();
 
     state = state.copyWith(todoItemsMap: {});
     final Map<DateTime, List<Event>> dataMap = {};
@@ -62,6 +66,7 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
           }
         }
       }
+      return todoList;
     }
   }
 }

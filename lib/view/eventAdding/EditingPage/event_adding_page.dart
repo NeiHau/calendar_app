@@ -96,19 +96,17 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                         ref.watch(todoDatabaseProvider.notifier);
                     todoProvider.writeData(data);
 
-                    /*
                     final saveProvider = ref.watch(eventStateProvider.notifier);
                     saveProvider.readDataMap();
-                    */
 
-                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, "/home", arguments: data);
                   },
             style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all<Color>(Colors.white)),
             child: const Text('保存'),
           ),
-        )
+        ),
       ];
 
   // タイトルに入力をするためのメソッド。

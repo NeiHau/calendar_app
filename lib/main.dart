@@ -1,11 +1,11 @@
 import 'package:first_app/view/calendar_event_list.dart';
+import 'package:first_app/view/calendar_list.dart';
 import 'package:first_app/view/eventAdding/EditingPage/event_adding_page.dart';
 import 'package:first_app/view/eventAdding/EditingPage/event_editing_page.dart';
 import 'package:first_app/view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 void main() {
@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         "/EventList": (context) => const CalendarEventList(),
         "/EditingPage": (context) => const EventEditingPage(),
         "/AddingPage": (context) => const EventAddingPage(),
+        "/ListEvent": (context) => const CalendarListDialog(),
       },
       home: const CalendarPage(),
     );

@@ -1,5 +1,6 @@
 import 'package:first_app/component/color.dart';
 import 'package:first_app/view/calendar_event_list.dart';
+import 'package:first_app/view/calendar_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +9,6 @@ import 'package:month_year_picker/month_year_picker.dart';
 final weekDayProvider = StateProvider(((ref) => 7));
 final foucusedDayProvider = StateProvider(((ref) => DateTime.now()));
 final cacheDateProvider = StateProvider(((ref) => DateTime.now()));
-//final whiteColorProvider = StateProvider(((ref) => Colors.white));
 
 class Calendar extends ConsumerStatefulWidget {
   final Color? color;
@@ -165,10 +165,11 @@ class CalendarState extends ConsumerState<Calendar> {
     for (int i = 1; i <= monthLastNumber; i++) {
       listCache.add(
         Expanded(
-            child: buildCalendarItem(
-                i,
-                DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
-                ref)),
+          child: buildCalendarItem(
+              i,
+              DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
+              ref),
+        ),
       );
       if (DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)
                   .weekday ==
@@ -181,22 +182,27 @@ class CalendarState extends ConsumerState<Calendar> {
                   .day <=
               7) {
             listCache.insert(
-                0,
-                Expanded(
-                    child: buildCalendarItem(
-                        previousMonthLastNumber - j,
-                        DateTime(
-                            firstDayOfTheMonth.year,
-                            firstDayOfTheMonth.month - 1,
-                            previousMonthLastNumber - j),
-                        ref)));
+              0,
+              Expanded(
+                child: buildCalendarItem(
+                    previousMonthLastNumber - j,
+                    DateTime(
+                        firstDayOfTheMonth.year,
+                        firstDayOfTheMonth.month - 1,
+                        previousMonthLastNumber - j),
+                    ref),
+              ),
+            );
           } else {
-            listCache.add(Expanded(
+            listCache.add(
+              Expanded(
                 child: buildCalendarItem(
                     nextMonthFirstNumber + j,
                     DateTime(firstDayOfTheMonth.year,
                         firstDayOfTheMonth.month + 1, nextMonthFirstNumber + j),
-                    ref)));
+                    ref),
+              ),
+            );
           }
         }
         list.add(Row(
@@ -239,7 +245,7 @@ class CalendarState extends ConsumerState<Calendar> {
           ),
           child: GestureDetector(
             onTap: () {
-              createTask(cacheDate);
+              createTask();
             },
             child: Text(
               '$i',
@@ -268,7 +274,7 @@ class CalendarState extends ConsumerState<Calendar> {
           ),
           child: GestureDetector(
             onTap: () {
-              createTask(cacheDate);
+              createTask();
             },
             child: Text(
               '$i',
@@ -302,7 +308,7 @@ class CalendarState extends ConsumerState<Calendar> {
         ),
       ),
       onTap: () {
-        createTask(cacheDate);
+        createTask();
         setState(() {});
       },
     );
@@ -352,76 +358,11 @@ class CalendarState extends ConsumerState<Calendar> {
   }
 
   // 日付をタップした際に表示させる予定追加画面のメソッド。
-  void createTask(DateTime cacheDate) {
-    final PageController controller;
-    final initialPage = getPageCount(firstDay, cacheDate);
-    controller =
-        PageController(initialPage: initialPage, viewportFraction: 0.85);
+  void createTask() {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.71,
-            child: PageView.builder(
-              controller: controller,
-              itemBuilder: (context, index) {
-                DateTime currentDate =
-                    getCurrentDate(initialPage, index, cacheDate);
-                return AlertDialog(
-                  insetPadding: const EdgeInsets.all(8),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                  ),
-                  title: Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.black12,
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            DateFormat('yyyy/MM/dd (EEE)', 'ja').format(
-                              DateTime(currentDate.year, currentDate.month,
-                                  currentDate.day),
-                            ),
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.normal),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, "/AddingPage");
-                              },
-                              icon: const Icon(Icons.add, color: Colors.blue)),
-                        ]),
-                  ),
-                  content: SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: const CalendarEventList(),
-                  ),
-                );
-              },
-            ),
-          ),
-        ]);
-      },
-    );
-  }
-
-  // 現在の日付から、指定されている日付(1970年1月)まで、どのくらいの月数があるかを計算するメソッド。
-  int getPageCount(DateTime firstDate, DateTime selectedDate) {
-    return selectedDate.difference(firstDate).inDays;
-  }
-
-  // 選択された日付が、今日からどれくらい離れているかを計算するメソッド。
-  DateTime getCurrentDate(int initial, int page, DateTime cacheDate) {
-    final distance = initial - page;
-    return DateTime(cacheDate.year, cacheDate.month, cacheDate.day - distance);
+        context: context,
+        builder: (BuildContext context) {
+          return const CalendarListDialog();
+        });
   }
 }

@@ -41,8 +41,8 @@ class MyDatabase extends _$MyDatabase {
   Future<List<TodoItemData>> readAllTodoData() => select(todoItem).get();
 
   // 選択された日付と同じ日付のデータを取得したい。
-  Future<List<TodoItemData>> readTodoData(DateTime data) =>
-      (select(todoItem)..where((it) => it.startDate.equals(selectedDate)))
+  Future<List<TodoItemData>> readTodoData(Event data) =>
+      (select(todoItem)..where((it) => it.startDate.equals(data.startDate)))
           .get();
 
   // 追加

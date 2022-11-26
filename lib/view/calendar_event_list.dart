@@ -19,8 +19,6 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
     final state = ref.watch(todoDatabaseProvider); // stateとnotifierは別で管理。
     List<Event> todoItems = state.todoItems;
 
-    //final Event arg = ModalRoute.of(context)?.settings.arguments as Event;
-
     // 全てのtileを格納するリスト
     List<Widget> tiles = buildTodoList(todoItems);
 
@@ -38,8 +36,6 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
 
   // 予定追加画面において、todoリストを作成するメソッド。
   List<Widget> buildTodoList(List<Event> todoItemList) {
-    //var isAllday = data.isAllDay;
-    bool isAllday = false; // とりあえず、初期値をここで入れておく。
     for (Event item in todoItemList) {
       Widget tile = Container(
         decoration: BoxDecoration(
@@ -54,10 +50,7 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
               Navigator.pushNamed(context, "/EditingPage", arguments: item),
           child: ListTile(
             tileColor: Colors.white,
-
-            // ここが分からない。終日かどうかを判定したい。
-            // 追加画面で得た終日チェックのデータを持ってきたい。
-            leading: (isAllday)
+            leading: (item.isAllDay == true)
                 ? const Text('終日')
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,

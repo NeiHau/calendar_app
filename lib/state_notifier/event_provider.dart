@@ -23,6 +23,9 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // 書き込み処理部分
   Future writeData(TodoItemData data) async {
+    if (data.title.isEmpty) {
+      return null;
+    }
     TodoItemCompanion entry = TodoItemCompanion(
       id: Value(data.id),
       title: Value(data.title),
@@ -57,6 +60,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   // データ読み込み処理
   Future readData() async {
     //final todoItems = await _db.readTodoData(temp.startDate);
+
     final todoItems = await _db.readAllTodoData();
 
     print(todoItems);
