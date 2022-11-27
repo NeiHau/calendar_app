@@ -1,6 +1,7 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -97,12 +98,10 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                         ref.watch(todoDatabaseProvider.notifier);
                     todoProvider.updateData(data);
 
-                    /*
                     final saveProvider = ref.watch(eventStateProvider.notifier);
                     saveProvider.readDataMap();
-                    */
 
-                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, "/home");
                   },
             style: ButtonStyle(
                 backgroundColor:
@@ -143,7 +142,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
         children: [
           ListTile(
             title: const Text('終日'),
-            trailing: createSwitch(0),
+            trailing: createSwitch(0, data),
           ),
           ListTile(
             title: const Text('開始'),
@@ -155,11 +154,15 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
-                    temp = data.copyWith(startDate: value);
+                    temp = temp.copyWith(startDate: value);
+                    //print(value);
+                    //print(temp.startDate);
                     setState(() {
+                      //startDate = value;
                       updated = updated.copyWith(isUpdated: true);
                     });
                   },
+                  use24hFormat: true,
                   mode: isAllDay
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
@@ -184,11 +187,13 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
-                    temp = data.copyWith(endDate: value);
+                    temp = temp.copyWith(endDate: value);
                     setState(() {
+                      //endDate = value;
                       updated = updated.copyWith(isUpdated: true);
                     });
                   },
+                  use24hFormat: true,
                   mode: isAllDay
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
@@ -209,15 +214,18 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
   }
 
   // 終日スイッチ
-  Switch createSwitch(int index) {
+  Switch createSwitch(int index, Event data) {
     return Switch(
-      value: temp.isAllDay,
+      value: data.isAllDay, // 追加画面で得たデータを渡す。
       onChanged: (value) {
+        temp = data.copyWith(isAllDay: value);
+        print(value); // true
+        updated = updated.copyWith(isUpdated: true);
         setState(() {
           isAllDay = value;
           updated = updated.copyWith(isUpdated: true);
         });
-        temp = temp.copyWith(isAllDay: value);
+        print(isAllDay); // false
       },
     );
   }
@@ -288,11 +296,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                     ref.watch(todoDatabaseProvider.notifier);
                                 todoProvider.deleteData(data);
 
-                                /*
                                 final deleteProvider =
                                     ref.watch(eventStateProvider.notifier);
                                 deleteProvider.readDataMap();
-                                */
 
                                 Navigator.pushNamed(context, "/home");
                               },

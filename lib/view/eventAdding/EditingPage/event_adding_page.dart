@@ -214,12 +214,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
     return Switch(
       value: temp.isAllDay,
       onChanged: (value) {
+        temp = temp.copyWith(isAllDay: value);
+        updated = updated.copyWith(isUpdated: true);
         setState(() {
           isAllDay = value;
           updated = updated.copyWith(isUpdated: true);
         });
-        temp = temp.copyWith(isAllDay: value);
-        updated = updated.copyWith(isUpdated: true);
         print(isAllDay);
       },
     );

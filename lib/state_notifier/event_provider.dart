@@ -3,7 +3,6 @@ import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:drift/drift.dart';
-import 'package:uuid/uuid.dart';
 
 final startDateProvider = StateProvider(((ref) => DateTime.now()));
 final endDateProvider = StateProvider(((ref) => DateTime.now));
@@ -25,7 +24,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   // 書き込み処理部分
   Future writeData(TodoItemData data) async {
     if (data.title.isEmpty) {
-      return null;
+      return;
     }
     TodoItemCompanion entry = TodoItemCompanion(
       id: Value(data.id),
@@ -52,6 +51,9 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // 更新処理部分
   Future updateData(TodoItemData data) async {
+    if (data.title.isEmpty) {
+      return;
+    }
     await _db.updateTodo(data);
 
     // 更新するたびにデータベースを読み込む。
@@ -61,8 +63,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   // データ読み込み処理
   Future readData() async {
     final todoItems = await _db.readAllTodoData();
-
-    print(todoItems);
 
     List<Event> todoList = [];
     for (int i = 0; i < todoItems.length; i++) {
@@ -75,7 +75,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
           isAllDay: todoItems[i].shujitsuBool));
     }
 
-    print(todoList);
     state = state.copyWith(
       todoItems: todoList,
     );

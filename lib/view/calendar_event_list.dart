@@ -1,11 +1,13 @@
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/state_notifier/event_provider.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class CalendarEventList extends ConsumerStatefulWidget {
-  const CalendarEventList({super.key});
+  const CalendarEventList({required this.currentDate, super.key});
+
+  final DateTime currentDate;
 
   @override
   ConsumerState<CalendarEventList> createState() => CalendarEventListState();
@@ -16,11 +18,14 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(todoDatabaseProvider); // stateとnotifierは別で管理。
-    List<Event> todoItems = state.todoItems;
+    final state = ref.watch(eventStateProvider);
+    final currentEvents = state.todoItemsMap[widget.currentDate];
+    List<Widget> tiles = [];
 
     // 全てのtileを格納するリスト
-    List<Widget> tiles = buildTodoList(todoItems);
+    if (currentEvents != null) {
+      tiles = buildTodoList(currentEvents);
+    }
 
     return Scaffold(
       body: Container(
@@ -35,8 +40,9 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
   }
 
   // 予定追加画面において、todoリストを作成するメソッド。
-  List<Widget> buildTodoList(List<Event> todoItemList) {
-    for (Event item in todoItemList) {
+  List<Widget> buildTodoList(List<Event> currentEvents) {
+    // currentEvents != null 入っているイベントをリストで表示
+    for (Event item in currentEvents) {
       Widget tile = Container(
         decoration: BoxDecoration(
             border: Border(
