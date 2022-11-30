@@ -14,9 +14,7 @@ final todoDatabaseProvider =
 
 // データベースの状態が変わるたびTodoのviewをビルドするようにするクラス。
 class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
-  TodoDatabaseNotifier(this.ref) : super(TodoEventList()) {
-    readData(); // ここで最初にデータを読み込んであげる。
-  }
+  TodoDatabaseNotifier(this.ref) : super(TodoEventList());
 
   final Ref ref;
   final _db = MyDatabase();

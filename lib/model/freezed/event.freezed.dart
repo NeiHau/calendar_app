@@ -155,20 +155,18 @@ class __$$_EventCopyWithImpl<$Res> extends _$EventCopyWithImpl<$Res, _$_Event>
 class _$_Event implements _Event {
   _$_Event(
       {required this.id,
-      this.title = '',
-      this.description = '',
+      required this.title,
+      required this.description,
       required this.startDate,
       required this.endDate,
-      this.isAllDay = false});
+      required this.isAllDay});
 
   @override
   final String id;
   @override
-  @JsonKey()
   final String title;
 // タイトル
   @override
-  @JsonKey()
   final String description;
 //コメント
   @override
@@ -178,7 +176,6 @@ class _$_Event implements _Event {
   final DateTime endDate;
 // 終了日
   @override
-  @JsonKey()
   final bool isAllDay;
 
   @override
@@ -216,11 +213,11 @@ class _$_Event implements _Event {
 abstract class _Event implements Event {
   factory _Event(
       {required final String id,
-      final String title,
-      final String description,
+      required final String title,
+      required final String description,
       required final DateTime startDate,
       required final DateTime endDate,
-      final bool isAllDay}) = _$_Event;
+      required final bool isAllDay}) = _$_Event;
 
   @override
   String get id;

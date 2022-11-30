@@ -1,7 +1,7 @@
 import 'package:first_app/view/calendar_event_list.dart';
 import 'package:first_app/view/calendar_list.dart';
-import 'package:first_app/view/eventAdding/EditingPage/event_adding_page.dart';
-import 'package:first_app/view/eventAdding/EditingPage/event_editing_page.dart';
+import 'package:first_app/view/eventAddingPage/event_adding_page.dart';
+import 'package:first_app/view/eventEditingPage/event_editing_page.dart';
 import 'package:first_app/view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

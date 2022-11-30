@@ -1,4 +1,5 @@
 import 'package:first_app/component/color.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/view/calendar_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,6 +34,10 @@ class CalendarState extends ConsumerState<Calendar> {
 
   @override
   void initState() {
+    // 最初にデータを読み込む
+    final read = ref.read(eventStateProvider.notifier);
+    read.readDataMap();
+
     selectedDate = ref.read(foucusedDayProvider.notifier).state;
     final initialPageCount = getPageCount(firstDay, selectedDate);
     prevPage = initialPageCount;

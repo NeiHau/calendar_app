@@ -19,6 +19,7 @@ class CalendarEventListState extends ConsumerState<CalendarEventList> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(eventStateProvider);
+    // リストで表示したいイベント
     final currentEvents = state.todoItemsMap[widget.currentDate];
     List<Widget> tiles = [];
 

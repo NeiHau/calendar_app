@@ -12,62 +12,71 @@ import 'package:uuid/uuid.dart';
 final startDayProvider = StateProvider((ref) => DateTime.now());
 final finishDayProvider = StateProvider((ref) => DateTime.now());
 
-class EventAddingPage extends ConsumerStatefulWidget {
-  const EventAddingPage({super.key, this.event});
+class EventEditingPage extends ConsumerStatefulWidget {
+  const EventEditingPage({this.event, super.key});
 
   final Event? event;
 
   @override
-  ConsumerState<EventAddingPage> createState() => EventAddingPageState();
+  ConsumerState<EventEditingPage> createState() => EventEditingPageState();
 }
 
-class EventAddingPageState extends ConsumerState<EventAddingPage> {
+class EventEditingPageState extends ConsumerState<EventEditingPage> {
   final _formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
   late FocusNode addTaskFocusNode;
-  bool isAllDay = false;
+  bool isAllDay = false; // 終日かどうかを判定。
   static var uuid = const Uuid(); // idを取得
 
   Event temp = Event(
       id: uuid.v1(),
+      title: '',
+      description: '',
       startDate: DateTime.now(),
-      endDate: DateTime.now()); //frezzedで格納した値をインスタンス化
-  TodoEventList updated = TodoEventList(isUpdated: false);
+      endDate: DateTime.now(),
+      isAllDay: false);
+  TodoEventList updated =
+      TodoEventList(isUpdated: false); // 編集画面で入力が更新されたかどうかを判定する際に用いる変数。
 
   @override
   void initState() {
     super.initState();
-
-    if (widget.event == null) {
-      startDate = DateTime.now();
-      endDate = DateTime.now().add(const Duration(hours: 2));
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(todoDatabaseProvider);
+    List<Event> todoItems = state.todoItems;
+
+    // 追加画面で入力したデータを編集画面に渡す際に用いる変数。
+    final Event args = ModalRoute.of(context)?.settings.arguments as Event;
+
+    Event temp = args;
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Center(
-          child: Text('予定の追加'),
+          child: Text('予定の編集'),
         ),
         leading: const CloseButton(),
         actions: buildEditingActions(),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              buildTitle(), // タイトルを入力
-              sizedBox(), // 余白を生成する
-              selectShujitsuDay(), // 開始日・終了日を選択
-              buildDescription(), // コメントを入力
+              buildTitle(args),
+              sizedBox(),
+              selectShujitsuDay(args),
+              buildDescription(args),
+              sizedBox(),
+              deleteSchedule(todoItems, args),
             ],
           ),
         ),
@@ -75,12 +84,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
     );
   }
 
-  // 「保存」ボタンを表示させるためのメソッド。
+  // 「保存」ボタンを作成するメソッド
   List<Widget> buildEditingActions() => [
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 5, 10),
           child: TextButton(
-            onPressed: (updated.isUpdated == false && temp.title == '')
+            onPressed: (updated.isUpdated == false)
                 ? null
                 : () {
                     TodoItemData data = TodoItemData(
@@ -91,47 +100,51 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                       endDate: temp.endDate,
                       shujitsuBool: temp.isAllDay,
                     );
+
                     // 'todoprovider'でProviderのメソッドや値を取得。
                     final todoProvider =
                         ref.watch(todoDatabaseProvider.notifier);
-                    todoProvider.writeData(data);
+                    todoProvider.updateData(data);
 
+                    // 更新されたデータをMap型に変換して保存
                     final saveProvider = ref.watch(eventStateProvider.notifier);
                     saveProvider.readDataMap();
 
-                    Navigator.pushNamed(context, "/home", arguments: data);
+                    Navigator.pushNamed(context, "/home");
                   },
             style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all<Color>(Colors.white)),
             child: const Text('保存'),
           ),
-        ),
+        )
       ];
 
-  // タイトルに入力をするためのメソッド。
-  Widget buildTitle() => Card(
+  // タイトルを入力するメソッド
+  Widget buildTitle(Event data) => Card(
         child: Container(
-            padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
-            child: TextFormField(
-              onChanged: (value) {
-                temp = temp.copyWith(title: value);
-                setState(() {
-                  updated = updated.copyWith(isUpdated: true);
-                });
-              },
-              style:
-                  const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-              decoration: const InputDecoration(
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  border: UnderlineInputBorder(),
-                  hintText: 'タイトルを入力してください'),
-            )),
+          padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
+          child: TextFormField(
+            initialValue: data.title,
+            onChanged: (value) {
+              temp = temp.copyWith(title: value);
+              setState(() {
+                updated = updated.copyWith(isUpdated: true);
+              });
+            },
+            style: const TextStyle(fontSize: 12),
+            decoration: const InputDecoration(
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              border: UnderlineInputBorder(),
+              hintText: 'タイトルを入力してください',
+            ),
+          ),
+        ),
       );
 
-  // 開始日、終了日を入力するためのメソッド。
-  Card selectShujitsuDay() {
+  // 開始日と終了日を選択するメソッド
+  Widget selectShujitsuDay(Event data) {
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -144,14 +157,19 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             title: const Text('開始'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text(isAllDay
-                  ? DateFormat('yyyy-MM-dd').format(startDate)
-                  : DateFormat('yyyy-MM-dd HH:mm').format(startDate)),
+              child: Text((isAllDay == true)
+                  ? DateFormat('yyyy-MM-dd').format(temp.startDate)
+                  : DateFormat('yyyy-MM-dd HH:mm').format(temp.startDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
+                  initialDateTime: DateTime(
+                    data.startDate.year,
+                    data.startDate.month,
+                    data.startDate.day,
+                    data.startDate.hour,
+                  ),
                   onDateTimeChanged: (value) {
-                    temp = temp.copyWith(startDate: value);
-                    updated = updated.copyWith(isUpdated: true); // 更新
+                    temp = data.copyWith(startDate: value);
                     setState(() {
                       startDate = value;
                       updated = updated.copyWith(isUpdated: true);
@@ -162,12 +180,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
-                  initialDateTime: DateTime(
-                    startDate.year,
-                    startDate.month,
-                    startDate.day,
-                    startDate.hour,
-                  ),
                 ));
               },
             ),
@@ -177,13 +189,18 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
               child: Text((isAllDay == true)
-                  ? DateFormat('yyyy-MM-dd').format(endDate)
-                  : DateFormat('yyyy-MM-dd HH:mm').format(endDate)),
+                  ? DateFormat('yyyy-MM-dd').format(temp.endDate)
+                  : DateFormat('yyyy-MM-dd HH:mm').format(temp.endDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
+                  initialDateTime: DateTime(
+                    data.endDate.year,
+                    data.endDate.month,
+                    data.endDate.day,
+                    data.endDate.hour,
+                  ),
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(endDate: value);
-                    updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       endDate = value;
                       updated = updated.copyWith(isUpdated: true);
@@ -194,12 +211,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
-                  initialDateTime: DateTime(
-                    endDate.year,
-                    endDate.month,
-                    endDate.day,
-                    endDate.hour,
-                  ),
                 ));
               },
             ),
@@ -212,41 +223,111 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   // 終日スイッチ
   Switch createSwitch(int index) {
     return Switch(
-      value: temp.isAllDay,
+      value: temp.isAllDay, // 追加画面で得たデータを渡す。
       onChanged: (value) {
         temp = temp.copyWith(isAllDay: value);
+
         updated = updated.copyWith(isUpdated: true);
         setState(() {
           isAllDay = value;
           updated = updated.copyWith(isUpdated: true);
         });
-        print(isAllDay);
       },
     );
   }
 
-  // コメントを入力
-  Widget buildDescription() {
+  // コメント入力するフォームを作成するメソッド
+  Widget buildDescription(Event data) {
     return Card(
       child: Container(
         padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
         child: TextFormField(
-          onChanged: (value) {
-            temp = temp.copyWith(description: value);
-            setState(() {
-              updated = updated.copyWith(isUpdated: true);
-            });
-          },
+          initialValue: temp.description,
           style: const TextStyle(fontSize: 12),
           decoration: const InputDecoration(
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
             border: UnderlineInputBorder(),
-            hintText: 'コメントを入力してください',
+            hintText: '入力してください',
           ),
           maxLines: 8,
+          onChanged: (value) {
+            temp = data.copyWith(description: value);
+            setState(() {
+              updated = updated.copyWith(isUpdated: true);
+            });
+          },
         ),
       ),
+    );
+  }
+
+  // 予定を削除するメソッド
+  Widget deleteSchedule(List<Event> todoItemList, Event data) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.red,
+        backgroundColor: Colors.white,
+        fixedSize: const Size(450, 50), //(横、高さ)
+      ),
+      onPressed: () {
+        showCupertinoModalPopup<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoActionSheet(
+              actions: [
+                CupertinoActionSheetAction(
+                  child: const Text('編集を破棄'),
+                  onPressed: () => {
+                    Navigator.of(context).pop(),
+                    showCupertinoDialog(
+                      context: context,
+                      builder: (context) {
+                        return CupertinoAlertDialog(
+                          title: const Text("予定の削除"),
+                          content: const Text('本当にこの日の予定を削除しますか？'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text(
+                                "キャンセル",
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                final todoProvider =
+                                    ref.watch(todoDatabaseProvider.notifier);
+                                todoProvider.deleteData(data);
+
+                                final deleteProvider =
+                                    ref.watch(eventStateProvider.notifier);
+                                deleteProvider.readDataMap();
+
+                                Navigator.pushNamed(context, "/home");
+                              },
+                              child: const Text('削除'),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  },
+                ),
+              ],
+              cancelButton: CupertinoActionSheetAction(
+                child: const Text('キャンセル'),
+                onPressed: () => {
+                  Navigator.of(context).pop(),
+                },
+              ),
+            );
+          },
+        );
+      },
+      child: const Text('この予定を削除'),
     );
   }
 
@@ -312,8 +393,11 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             ));
   }
 
-  // 余白を作るためのメソッド。
+  // 余白を作りたい時に用いるメソッド
   Widget sizedBox() {
-    return const SizedBox(height: 25, width: 10);
+    return const SizedBox(
+      height: 25,
+      width: 10,
+    );
   }
 }

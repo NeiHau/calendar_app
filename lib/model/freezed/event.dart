@@ -7,10 +7,10 @@ abstract class Event with _$Event {
   // 入力中のデータを保持するクラス。
   factory Event({
     required String id,
-    @Default('') String title, // タイトル
-    @Default('') String description, //コメント
+    required String title, // タイトル
+    required String description, //コメント
     required DateTime startDate, // 開始日
     required DateTime endDate, // 終了日
-    @Default(false) bool isAllDay, // 終日
+    required bool isAllDay, // 終日
   }) = _Event;
 }
