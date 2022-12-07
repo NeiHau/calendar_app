@@ -1,8 +1,8 @@
-import 'package:first_app/view/calendar_event_list.dart';
-import 'package:first_app/view/calendar_list.dart';
+import 'package:first_app/view/calendarView/calendar_event_list.dart';
+import 'package:first_app/view/calendarView/calendar_list.dart';
 import 'package:first_app/view/eventAddingPage/event_adding_page.dart';
 import 'package:first_app/view/eventEditingPage/event_editing_page.dart';
-import 'package:first_app/view/calendar_view.dart';
+import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         "/home": (context) => const CalendarPage(),
         "/EventList": (context) =>
             CalendarEventList(currentDate: DateTime.now()),
-        "/EditingPage": (context) => const EventEditingPage(),
+        "/EditingPage": (context) => EventEditingPage(),
         "/AddingPage": (context) => const EventAddingPage(),
         "/ListEvent": (context) => const CalendarListDialog(),
       },

@@ -1,5 +1,5 @@
-import 'package:first_app/view/calendar.dart';
-import 'package:first_app/view/calendar_event_list.dart';
+import 'package:first_app/view/calendarView/calendar.dart';
+import 'package:first_app/view/calendarView/calendar_event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';

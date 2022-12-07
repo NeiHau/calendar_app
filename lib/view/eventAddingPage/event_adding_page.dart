@@ -13,7 +13,10 @@ final startDayProvider = StateProvider((ref) => DateTime.now());
 final finishDayProvider = StateProvider((ref) => DateTime.now());
 
 class EventAddingPage extends ConsumerStatefulWidget {
-  const EventAddingPage({super.key, this.event});
+  const EventAddingPage({
+    super.key,
+    this.event,
+  });
 
   final Event? event;
 
@@ -37,7 +40,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
       title: '',
       description: '',
       isAllDay: false); //frezzedで格納した値をインスタンス化
-  TodoEventList updated = TodoEventList(isUpdated: false);
 
   @override
   void initState() {
@@ -83,7 +85,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 5, 10),
           child: TextButton(
-            onPressed: (updated.isUpdated == false && temp.title == '')
+            onPressed: (temp.title == '' || temp.description == '')
                 ? null
                 : () {
                     TodoItemData data = TodoItemData(
@@ -119,9 +121,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             child: TextFormField(
               onChanged: (value) {
                 temp = temp.copyWith(title: value);
-                setState(() {
-                  updated = updated.copyWith(isUpdated: true);
-                });
+                setState(() {});
               },
               style:
                   const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
@@ -154,10 +154,8 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(startDate: value);
-                    updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       startDate = value;
-                      updated = updated.copyWith(isUpdated: true);
                     });
                   },
                   use24hFormat: true,
@@ -179,17 +177,15 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             title: const Text('終了'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text((isAllDay == true)
+              child: Text(isAllDay
                   ? DateFormat('yyyy-MM-dd').format(endDate)
                   : DateFormat('yyyy-MM-dd HH:mm').format(endDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(endDate: value);
-                    updated = updated.copyWith(isUpdated: true); // 更新
                     setState(() {
                       endDate = value;
-                      updated = updated.copyWith(isUpdated: true);
                     });
                   },
                   use24hFormat: true,
@@ -218,12 +214,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
       value: temp.isAllDay,
       onChanged: (value) {
         temp = temp.copyWith(isAllDay: value);
-        updated = updated.copyWith(isUpdated: true);
         setState(() {
           isAllDay = value;
-          updated = updated.copyWith(isUpdated: true);
         });
-        print(isAllDay);
       },
     );
   }
@@ -236,9 +229,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         child: TextFormField(
           onChanged: (value) {
             temp = temp.copyWith(description: value);
-            setState(() {
-              updated = updated.copyWith(isUpdated: true);
-            });
+            setState(() {});
           },
           style: const TextStyle(fontSize: 12),
           decoration: const InputDecoration(
