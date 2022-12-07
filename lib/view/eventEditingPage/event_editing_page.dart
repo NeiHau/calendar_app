@@ -11,6 +11,15 @@ import 'package:uuid/uuid.dart';
 
 final startDayProvider = StateProvider((ref) => DateTime.now());
 final finishDayProvider = StateProvider((ref) => DateTime.now());
+final tempProvider = StateProvider((ref) {
+  return Event(
+      id: "",
+      title: "",
+      description: "",
+      startDate: DateTime.now(),
+      endDate: DateTime.now(),
+      isAllDay: false);
+});
 
 class EventEditingPage extends ConsumerStatefulWidget {
   const EventEditingPage({super.key});
@@ -25,7 +34,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
   late FocusNode addTaskFocusNode;
-  bool isAllDay = false;
+  // bool isAllDay = false;
   static var uuid = const Uuid(); // idを取得
 
   late Event temp;
@@ -148,13 +157,13 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
         children: [
           ListTile(
             title: const Text('終日'),
-            trailing: createSwitch(temp.isAllDay),
+            trailing: createSwitch(0),
           ),
           ListTile(
             title: const Text('開始'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text(isAllDay == false
+              child: Text(temp.isAllDay == false
                   ? DateFormat('yyyy-MM-dd').format(temp.startDate)
                   : DateFormat('yyyy-MM-dd HH:mm').format(temp.startDate)),
               onPressed: () {
@@ -172,7 +181,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     });
                   },
                   use24hFormat: true,
-                  mode: isAllDay == true
+                  mode: temp.isAllDay == true
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
@@ -184,7 +193,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             title: const Text('終了'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text(isAllDay == false
+              child: Text(temp.isAllDay == false
                   ? DateFormat('yyyy-MM-dd').format(temp.endDate)
                   : DateFormat('yyyy-MM-dd HH:mm').format(temp.endDate)),
               onPressed: () {
@@ -202,7 +211,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     });
                   },
                   use24hFormat: true,
-                  mode: isAllDay == true
+                  mode: temp.isAllDay == true
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
@@ -216,15 +225,18 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
   }
 
   // 終日スイッチ
-  Switch createSwitch(bool value) {
+  Switch createSwitch(int index) {
     return Switch(
       value: temp.isAllDay,
       onChanged: (value) {
-        temp = temp.copyWith(isAllDay: value);
+        // print(value);
+        // print(temp.isAllDay);
         setState(() {
-          isAllDay = value;
+          temp = temp.copyWith(isAllDay: value);
+          print(temp);
         });
-        print(isAllDay);
+        print(temp.isAllDay);
+        // print(isAllDay);
       },
     );
   }
@@ -358,7 +370,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                               final isEqual = endDate.microsecondsSinceEpoch ==
                                   startDate.millisecondsSinceEpoch;
 
-                              if (isAllDay) {
+                              if (temp.isAllDay) {
                                 if (isEndTimeBefore || isEqual) {
                                   setState(() {
                                     endDate = startDate;

@@ -248,7 +248,7 @@ class CalendarState extends ConsumerState<Calendar> {
           ),
           child: GestureDetector(
             onTap: () {
-              createTask();
+              createTask(cacheDate);
             },
             child: Text(
               '$i',
@@ -277,7 +277,7 @@ class CalendarState extends ConsumerState<Calendar> {
           ),
           child: GestureDetector(
             onTap: () {
-              createTask();
+              createTask(cacheDate);
             },
             child: Text(
               '$i',
@@ -311,7 +311,7 @@ class CalendarState extends ConsumerState<Calendar> {
         ),
       ),
       onTap: () {
-        createTask();
+        createTask(cacheDate);
       },
     );
   }
@@ -360,11 +360,13 @@ class CalendarState extends ConsumerState<Calendar> {
   }
 
   // 日付をタップした際に表示させる予定追加画面のメソッド。
-  void createTask() {
+  void createTask(DateTime cacheDate) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return const CalendarListDialog();
+          return CalendarListDialog(
+            cacheDate: cacheDate,
+          );
         });
   }
 }

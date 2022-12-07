@@ -5,12 +5,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class CalendarListDialog extends ConsumerWidget {
-  const CalendarListDialog({super.key});
+  const CalendarListDialog({super.key, required this.cacheDate});
+
+  final DateTime cacheDate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final firstDay = DateTime(1970);
-    DateTime cacheDate = ref.read(cacheDateProvider);
     final PageController controller;
     final initialPage = getPageCount(firstDay, cacheDate);
     controller =

@@ -41,7 +41,8 @@ class MyApp extends StatelessWidget {
             CalendarEventList(currentDate: DateTime.now()),
         "/EditingPage": (context) => EventEditingPage(),
         "/AddingPage": (context) => const EventAddingPage(),
-        "/ListEvent": (context) => const CalendarListDialog(),
+        "/ListEvent": (context) =>
+            CalendarListDialog(cacheDate: DateTime.now()),
       },
       home: const CalendarPage(),
     );
