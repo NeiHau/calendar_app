@@ -1,6 +1,5 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/model/freezed/event_list.dart';
 import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,20 +8,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+// 開始日
 final startDayProvider = StateProvider((ref) => DateTime.now());
+// 終了日
 final finishDayProvider = StateProvider((ref) => DateTime.now());
-final tempProvider = StateProvider((ref) {
-  return Event(
-      id: "",
-      title: "",
-      description: "",
-      startDate: DateTime.now(),
-      endDate: DateTime.now(),
-      isAllDay: false);
-});
 
 class EventEditingPage extends ConsumerStatefulWidget {
-  const EventEditingPage({super.key});
+  const EventEditingPage({super.key, required this.arguments});
+
+  // 追加画面から引き継いだデータ。
+  final Event arguments;
 
   @override
   ConsumerState<EventEditingPage> createState() => EventEditingPageState();
@@ -34,22 +29,13 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
   late FocusNode addTaskFocusNode;
-  // bool isAllDay = false;
+  bool isAllDay = false;
   static var uuid = const Uuid(); // idを取得
-
   late Event temp;
-  // Event temp2 = Event(
-  //     id: uuid.v1(),
-  //     title: '',
-  //     description: '',
-  //     startDate: DateTime.now(),
-  //     endDate: DateTime.now(),
-  //     isAllDay: false);
-  TodoEventList updatedTitle = TodoEventList(isUpdated: false);
-  TodoEventList updatedDescription = TodoEventList(isUpdated: false);
 
   @override
   void initState() {
+    temp = widget.arguments;
     super.initState();
   }
 
@@ -57,12 +43,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(todoDatabaseProvider);
     List<Event> todoItems = state.todoItems;
-
-    // 追加画面で入力したデータを編集画面に渡す際に用いる変数。
-    final Event args = ModalRoute.of(context)?.settings.arguments as Event;
-
-    // Event型、lateで宣言したtempに値を代入。
-    temp = args;
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -85,7 +65,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               selectShujitsuDay(),
               buildDescription(),
               sizedBox(),
-              deleteSchedule(todoItems, args),
+              deleteSchedule(todoItems, widget.arguments),
             ],
           ),
         ),
@@ -134,9 +114,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             initialValue: temp.title,
             onChanged: (value) {
               temp = temp.copyWith(title: value);
-              setState(() {
-                //updatedTitle = updatedTitle.copyWith(isUpdated: true);
-              });
             },
             style: const TextStyle(fontSize: 12),
             decoration: const InputDecoration(
@@ -163,7 +140,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             title: const Text('開始'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text(temp.isAllDay == false
+              child: Text(temp.isAllDay
                   ? DateFormat('yyyy-MM-dd').format(temp.startDate)
                   : DateFormat('yyyy-MM-dd HH:mm').format(temp.startDate)),
               onPressed: () {
@@ -181,7 +158,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     });
                   },
                   use24hFormat: true,
-                  mode: temp.isAllDay == true
+                  mode: temp.isAllDay
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
@@ -193,7 +170,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             title: const Text('終了'),
             trailing: TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.black),
-              child: Text(temp.isAllDay == false
+              child: Text(temp.isAllDay
                   ? DateFormat('yyyy-MM-dd').format(temp.endDate)
                   : DateFormat('yyyy-MM-dd HH:mm').format(temp.endDate)),
               onPressed: () {
@@ -211,7 +188,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     });
                   },
                   use24hFormat: true,
-                  mode: temp.isAllDay == true
+                  mode: temp.isAllDay
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
@@ -229,14 +206,9 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
     return Switch(
       value: temp.isAllDay,
       onChanged: (value) {
-        // print(value);
-        // print(temp.isAllDay);
         setState(() {
           temp = temp.copyWith(isAllDay: value);
-          print(temp);
         });
-        print(temp.isAllDay);
-        // print(isAllDay);
       },
     );
   }
@@ -250,9 +222,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
           initialValue: temp.description,
           onChanged: (value) {
             temp = temp.copyWith(description: value);
-            setState(() {
-              //updatedDescription = updatedDescription.copyWith(isUpdated: true);
-            });
           },
           style: const TextStyle(fontSize: 12),
           decoration: const InputDecoration(
@@ -363,8 +332,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                             onPressed: () {
                               final isEndTimeBefore =
                                   endDate.isBefore(startDate);
-                              // print(endDate);
-                              // print(startDate);
                               final isStartTimeAfter =
                                   startDate.isAfter(endDate);
                               final isEqual = endDate.microsecondsSinceEpoch ==
@@ -374,10 +341,12 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                 if (isEndTimeBefore || isEqual) {
                                   setState(() {
                                     endDate = startDate;
+                                    print(endDate);
                                   });
                                 } else if (isStartTimeAfter) {
                                   setState(() {
                                     endDate = startDate;
+                                    print(endDate);
                                   });
                                 }
                               } else {

@@ -12,5 +12,6 @@ abstract class Event with _$Event {
     required DateTime startDate, // 開始日
     required DateTime endDate, // 終了日
     required bool isAllDay, // 終日
+    // required bool isUpdated, // タイトルとコメントが更新をされたかどうかを判定する。
   }) = _Event;
 }

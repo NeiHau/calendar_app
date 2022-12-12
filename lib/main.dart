@@ -1,3 +1,4 @@
+import 'package:first_app/routes/route.dart';
 import 'package:first_app/view/calendarView/calendar_event_list.dart';
 import 'package:first_app/view/calendarView/calendar_list.dart';
 import 'package:first_app/view/eventAddingPage/event_adding_page.dart';
@@ -35,15 +36,16 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      routes: {
-        "/home": (context) => const CalendarPage(),
-        "/EventList": (context) =>
-            CalendarEventList(currentDate: DateTime.now()),
-        "/EditingPage": (context) => EventEditingPage(),
-        "/AddingPage": (context) => const EventAddingPage(),
-        "/ListEvent": (context) =>
-            CalendarListDialog(cacheDate: DateTime.now()),
-      },
+      // routes: {
+      //   "/home": (context) => const CalendarPage(),
+      //   "/EventList": (context) =>
+      //       CalendarEventList(currentDate: DateTime.now()),
+      //   "/EditingPage": (context) => EventEditingPage(),
+      //   "/AddingPage": (context) => const EventAddingPage(),
+      //   "/ListEvent": (context) =>
+      //       CalendarListDialog(cacheDate: DateTime.now()),
+      // },
+      onGenerateRoute: RouteGenerator.generatedRoute,
       home: const CalendarPage(),
     );
   }
