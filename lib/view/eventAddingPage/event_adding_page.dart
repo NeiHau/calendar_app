@@ -1,6 +1,5 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/model/freezed/event_list.dart';
 import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,9 +15,11 @@ class EventAddingPage extends ConsumerStatefulWidget {
   const EventAddingPage({
     super.key,
     this.event,
+    required this.currentDate,
   });
 
   final Event? event;
+  final DateTime currentDate;
 
   @override
   ConsumerState<EventAddingPage> createState() => EventAddingPageState();
@@ -32,7 +33,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   late FocusNode addTaskFocusNode;
   bool isAllDay = false;
   static var uuid = const Uuid(); // idを取得
-
   Event temp = Event(
       id: uuid.v1(),
       startDate: DateTime.now(),
@@ -43,12 +43,11 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   @override
   void initState() {
-    super.initState();
-
     if (widget.event == null) {
-      startDate = DateTime.now();
-      endDate = DateTime.now().add(const Duration(hours: 2));
+      startDate = widget.currentDate;
+      endDate = startDate.add(const Duration(hours: 2));
     }
+    super.initState();
   }
 
   @override
@@ -104,7 +103,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     final saveProvider = ref.watch(eventStateProvider.notifier);
                     saveProvider.readDataMap();
 
-                    Navigator.pushNamed(context, "/home", arguments: data);
+                    //Navigator.pushNamed(context, '/home');
+                    Navigator.popUntil(
+                        context, (Route<dynamic> route) => route.isFirst);
                   },
             style: ButtonStyle(
                 backgroundColor:
@@ -152,6 +153,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                   : DateFormat('yyyy-MM-dd HH:mm').format(startDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
+                  initialDateTime: DateTime(
+                    widget.currentDate.year,
+                    widget.currentDate.month,
+                    widget.currentDate.day,
+                    widget.currentDate.hour,
+                  ),
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(startDate: value);
                     setState(() {
@@ -163,12 +170,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
-                  initialDateTime: DateTime(
-                    startDate.year,
-                    startDate.month,
-                    startDate.day,
-                    startDate.hour,
-                  ),
                 ));
               },
             ),
@@ -182,6 +183,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                   : DateFormat('yyyy-MM-dd HH:mm').format(endDate)),
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
+                  initialDateTime: DateTime(
+                    endDate.year,
+                    endDate.month,
+                    endDate.day,
+                    endDate.hour,
+                  ),
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(endDate: value);
                     setState(() {
@@ -193,12 +200,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                       ? CupertinoDatePickerMode.date
                       : CupertinoDatePickerMode.dateAndTime,
                   minuteInterval: 15,
-                  initialDateTime: DateTime(
-                    endDate.year,
-                    endDate.month,
-                    endDate.day,
-                    endDate.hour,
-                  ),
                 ));
               },
             ),
@@ -271,17 +272,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                             onPressed: () {
                               final isEndTimeBefore =
                                   endDate.isBefore(startDate);
-                              final isStartTimeAfter =
-                                  startDate.isAfter(endDate);
+
                               final isEqual = endDate.microsecondsSinceEpoch ==
                                   startDate.millisecondsSinceEpoch;
 
                               if (isAllDay) {
                                 if (isEndTimeBefore || isEqual) {
-                                  setState(() {
-                                    endDate = startDate;
-                                  });
-                                } else if (isStartTimeAfter) {
                                   setState(() {
                                     endDate = startDate;
                                   });

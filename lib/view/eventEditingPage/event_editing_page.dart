@@ -96,7 +96,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               final saveProvider = ref.watch(eventStateProvider.notifier);
               saveProvider.readDataMap();
 
-              Navigator.pushNamed(context, "/home");
+              Navigator.popUntil(context, (route) => route.isFirst);
             },
             style: ButtonStyle(
                 backgroundColor:
@@ -280,7 +280,8 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                     ref.watch(eventStateProvider.notifier);
                                 deleteProvider.readDataMap();
 
-                                Navigator.pushNamed(context, "/home");
+                                Navigator.popUntil(
+                                    context, (route) => route.isFirst);
                               },
                               child: const Text('削除'),
                             ),
@@ -331,29 +332,25 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                         TextButton(
                             onPressed: () {
                               final isEndTimeBefore =
-                                  endDate.isBefore(startDate);
-                              final isStartTimeAfter =
-                                  startDate.isAfter(endDate);
-                              final isEqual = endDate.microsecondsSinceEpoch ==
-                                  startDate.millisecondsSinceEpoch;
+                                  temp.endDate.isBefore(temp.startDate);
+
+                              final isEqual =
+                                  temp.endDate.microsecondsSinceEpoch ==
+                                      temp.startDate.millisecondsSinceEpoch;
 
                               if (temp.isAllDay) {
                                 if (isEndTimeBefore || isEqual) {
                                   setState(() {
-                                    endDate = startDate;
-                                    print(endDate);
-                                  });
-                                } else if (isStartTimeAfter) {
-                                  setState(() {
-                                    endDate = startDate;
-                                    print(endDate);
+                                    temp =
+                                        temp.copyWith(endDate: temp.startDate);
                                   });
                                 }
                               } else {
                                 if (isEndTimeBefore || isEqual) {
                                   setState(() {
-                                    endDate =
-                                        startDate.add(const Duration(hours: 1));
+                                    temp = temp.copyWith(
+                                        endDate: temp.startDate
+                                            .add(const Duration(hours: 1)));
                                   });
                                 }
                               }

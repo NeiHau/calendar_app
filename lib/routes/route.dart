@@ -24,7 +24,9 @@ class RouteGenerator {
             builder: (context) =>
                 CalendarEventList(currentDate: DateTime.now()));
       case eventAddingPage:
-        return MaterialPageRoute(builder: (context) => const EventAddingPage());
+        final currentDate = settings.arguments as DateTime;
+        return MaterialPageRoute(
+            builder: (context) => EventAddingPage(currentDate: currentDate));
       case eventEditingPage:
         final arguments = settings.arguments as Event;
         return MaterialPageRoute(

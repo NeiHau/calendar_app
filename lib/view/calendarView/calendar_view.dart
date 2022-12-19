@@ -1,4 +1,4 @@
-import 'package:first_app/view/calendarView/calendar.dart';
+import 'package:first_app/view/calendarView/calendar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -42,7 +42,6 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                   final distance = initialPage - value;
                   return DateTime(now.year, now.month - distance);
                 });
-                setState(() {});
               },
             ),
           ),

@@ -1,4 +1,3 @@
-import 'package:first_app/view/calendarView/calendar.dart';
 import 'package:first_app/view/calendarView/calendar_event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -51,7 +50,8 @@ class CalendarListDialog extends ConsumerWidget {
                       ),
                       IconButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, "/AddingPage");
+                            Navigator.pushNamed(context, "/AddingPage",
+                                arguments: currentDate);
                           },
                           icon: const Icon(Icons.add, color: Colors.blue)),
                     ]),

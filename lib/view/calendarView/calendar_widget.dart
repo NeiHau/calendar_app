@@ -1,4 +1,3 @@
-import 'package:first_app/component/color.dart';
 import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/view/calendarView/calendar_list.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,6 @@ class CalendarState extends ConsumerState<Calendar> {
 
   @override
   void initState() {
-    // 最初にデータを読み込む
     final read = ref.read(eventStateProvider.notifier);
     read.readDataMap();
 
@@ -71,8 +69,6 @@ class CalendarState extends ConsumerState<Calendar> {
                     backgroundColor: Colors.white,
                     shape: const StadiumBorder()),
                 onPressed: () {
-                  // なぜか２回押さないと、今日の日付に遷移しない。１回で遷移させたい。
-                  // １回タップすると、月の最初の日に遷移。
                   widget.calendarController.animateToPage(
                       widget.calendarController.initialPage,
                       duration: const Duration(milliseconds: 2),
@@ -103,7 +99,7 @@ class CalendarState extends ConsumerState<Calendar> {
                 ),
               ),
               onTap: () {
-                setState(() {});
+                selectDate('ja');
               },
             )
           ]),
@@ -122,7 +118,7 @@ class CalendarState extends ConsumerState<Calendar> {
       weekList.add(
         Expanded(
           child: Container(
-            decoration: BoxDecoration(color: ref.read(greyProvider)),
+            decoration: BoxDecoration(color: Colors.grey[200]),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Text(
@@ -230,8 +226,9 @@ class CalendarState extends ConsumerState<Calendar> {
   // 上記の二点を以下のメソッド内で行う。
   Widget buildCalendarItem(int i, DateTime cacheDate, WidgetRef ref) {
     final focusedDay = ref.read(foucusedDayProvider);
-    bool isToday = (selectedDate.difference(cacheDate).inDays == 0) &&
-        (selectedDate.day == cacheDate.day);
+    final date = DateTime.now();
+    final today = DateTime(date.year, date.month, date.day);
+    bool isToday = cacheDate == today;
     bool isOutsideDay = (focusedDay.month != cacheDate.month);
 
     if (isToday) {
@@ -321,7 +318,7 @@ class CalendarState extends ConsumerState<Calendar> {
     const defaultTextColor = Colors.black87;
 
     if (day.weekday == DateTime.sunday) {
-      return ref.read(redProvider);
+      return Colors.red;
     }
     if (day.weekday == DateTime.saturday) {
       return Colors.blue[600]!;
@@ -343,12 +340,12 @@ class CalendarState extends ConsumerState<Calendar> {
   }
 
   // MonthYearPickerを表示させるメソッド。
-  selectDate({required BuildContext context, String? locale}) async {
+  selectDate(String? locale) async {
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
         context: context,
         initialDate: ref.read(foucusedDayProvider),
-        firstDate: DateTime(DateTime.now().year - 1),
+        firstDate: DateTime(1970, 1, 1),
         lastDate: DateTime(DateTime.now().year + 100),
         locale: localeObj);
 
@@ -364,9 +361,7 @@ class CalendarState extends ConsumerState<Calendar> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return CalendarListDialog(
-            cacheDate: cacheDate,
-          );
+          return CalendarListDialog(cacheDate: cacheDate);
         });
   }
 }
