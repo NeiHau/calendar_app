@@ -35,7 +35,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             child: PageView.builder(
               controller: calendarController,
               itemBuilder: (context, index) {
-                return Calendar(calendarController);
+                return Calendar(
+                    calendarController: calendarController,
+                    eventList: const []);
               },
               onPageChanged: (value) {
                 ref.read(foucusedDayProvider.notifier).update((state) {

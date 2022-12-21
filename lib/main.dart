@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
       //       CalendarListDialog(cacheDate: DateTime.now()),
       // },
       onGenerateRoute: RouteGenerator.generatedRoute,
-      home: const CalendarPage(),
+      home: CalendarPage(),
     );
   }
 }

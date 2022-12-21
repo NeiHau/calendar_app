@@ -1,5 +1,6 @@
 import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/view/calendarView/calendar_list.dart';
+import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -7,18 +8,23 @@ import 'package:month_year_picker/month_year_picker.dart';
 
 final weekDayProvider = StateProvider(((ref) => 7));
 final foucusedDayProvider = StateProvider(((ref) => DateTime.now()));
-final cacheDateProvider = StateProvider(((ref) => DateTime.now()));
-final todayProvider = StateProvider(((ref) => DateTime.now()));
 
 class Calendar extends ConsumerStatefulWidget {
+  const Calendar(
+      {required this.eventList,
+      required this.calendarController,
+      this.color,
+      this.now,
+      this.weekDay,
+      Key? key})
+      : super(key: key);
+
   final Color? color;
   final DateTime? now;
   final DateTime? weekDay;
   final PageController calendarController;
 
-  const Calendar(this.calendarController,
-      {this.color, this.now, this.weekDay, Key? key})
-      : super(key: key);
+  final List<Widget> eventList;
 
   @override
   ConsumerState<Calendar> createState() => CalendarState();
@@ -141,7 +147,7 @@ class CalendarState extends ConsumerState<Calendar> {
 
   // カレンダーの日にちを作成するメソッド
   Widget calendar(WidgetRef ref) {
-    List<Widget> list = []; // カレンダーの日数全てを含むリスト。1日〜最終日まで。
+    List<Widget> list = []; // カレンダーの日数全てを含むリスト。1日〜月の最終日まで。
 
     // 月の最初の日。
     DateTime firstDayOfTheMonth = DateTime(ref.watch(foucusedDayProvider).year,
@@ -164,15 +170,23 @@ class CalendarState extends ConsumerState<Calendar> {
     for (int i = 1; i <= monthLastNumber; i++) {
       listCache.add(
         Expanded(
-          child: buildCalendarItem(
-              i,
-              DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
-              ref),
+          child: Column(
+            children: [
+              buildCalendarItem(
+                  i,
+                  DateTime(
+                      firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
+                  ref),
+              (widget.eventList.isNotEmpty) // 予定が追加されたら点を表示させる。
+                  ? const Icon(Icons.brightness_1, color: Colors.black, size: 6)
+                  : const SizedBox(height: 0, width: 0),
+            ],
+          ),
         ),
       );
       if (DateTime(firstDayOfTheMonth.year, firstDayOfTheMonth.month, i)
                   .weekday ==
-              newLineNumber(startNumber: ref.read(weekDayProvider) + 1) ||
+              newLineNumber(ref.read(weekDayProvider) + 1) ||
           i == monthLastNumber) {
         int repeatNumber = 7 - listCache.length;
 
@@ -183,24 +197,24 @@ class CalendarState extends ConsumerState<Calendar> {
             listCache.insert(
               0,
               Expanded(
-                child: buildCalendarItem(
-                    previousMonthLastNumber - j,
-                    DateTime(
-                        firstDayOfTheMonth.year,
-                        firstDayOfTheMonth.month - 1,
-                        previousMonthLastNumber - j),
-                    ref),
-              ),
+                  child: buildCalendarItem(
+                      previousMonthLastNumber - j,
+                      DateTime(
+                          firstDayOfTheMonth.year,
+                          firstDayOfTheMonth.month - 1,
+                          previousMonthLastNumber - j),
+                      ref)),
             );
           } else {
             listCache.add(
               Expanded(
-                child: buildCalendarItem(
-                    nextMonthFirstNumber + j,
-                    DateTime(firstDayOfTheMonth.year,
-                        firstDayOfTheMonth.month + 1, nextMonthFirstNumber + j),
-                    ref),
-              ),
+                  child: buildCalendarItem(
+                      nextMonthFirstNumber + j,
+                      DateTime(
+                          firstDayOfTheMonth.year,
+                          firstDayOfTheMonth.month + 1,
+                          nextMonthFirstNumber + j),
+                      ref)),
             );
           }
         }
@@ -216,7 +230,7 @@ class CalendarState extends ConsumerState<Calendar> {
   }
 
   // 次の週に移行する際に用いるメソッド。例: 第一週目 → 第二週目。
-  int newLineNumber({required int startNumber}) {
+  int newLineNumber(int startNumber) {
     if (startNumber == 1) return 7;
     return startNumber - 1;
   }
@@ -239,10 +253,8 @@ class CalendarState extends ConsumerState<Calendar> {
           alignment: Alignment.center,
           width: 30,
           height: 30,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.blue,
-          ),
+          decoration:
+              const BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
           child: GestureDetector(
             onTap: () {
               createTask(cacheDate);
@@ -340,7 +352,7 @@ class CalendarState extends ConsumerState<Calendar> {
   }
 
   // MonthYearPickerを表示させるメソッド。
-  selectDate(String? locale) async {
+  Future<void> selectDate(String? locale) async {
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
         context: context,
@@ -354,6 +366,11 @@ class CalendarState extends ConsumerState<Calendar> {
     setState(() {
       ref.read(foucusedDayProvider.notifier).state = selectedDate;
     });
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => CalendarPage()));
   }
 
   // 日付をタップした際に表示させる予定追加画面のメソッド。

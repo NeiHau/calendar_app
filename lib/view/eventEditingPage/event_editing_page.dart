@@ -2,6 +2,7 @@ import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
+import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -280,8 +281,10 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                     ref.watch(eventStateProvider.notifier);
                                 deleteProvider.readDataMap();
 
-                                Navigator.popUntil(
-                                    context, (route) => route.isFirst);
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CalendarPage()));
                               },
                               child: const Text('削除'),
                             ),
@@ -354,7 +357,10 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                   });
                                 }
                               }
-                              Navigator.pop(context);
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CalendarPage()));
                             },
                             child: const Text('完了'))
                       ],
