@@ -1,6 +1,7 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_list.dart';
+import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:drift/drift.dart';
 
@@ -35,16 +36,18 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
     await _db.writeTodo(entry);
 
-    // 書き込むたびにデータベースを読み込む。
+    // 書き込むたびにデータベースを読み込んで、マップ型のデータに格納する。
     readData();
+    ref.read(eventStateProvider.notifier).readDataMap();
   }
 
   // 削除処理部分
   Future deleteData(Event data) async {
     await _db.deleteTodo(data);
 
-    // 削除するたびにデータベースを読み込む。
+    // 削除するたびにデータベースを読み込んで、マップ型に落とし込む。
     readData();
+    ref.read(eventStateProvider.notifier).readDataMap();
   }
 
   // 更新処理部分
@@ -56,6 +59,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
     // 更新するたびにデータベースを読み込む。
     readData();
+    ref.read(eventStateProvider.notifier).readDataMap();
   }
 
   // データ読み込み処理

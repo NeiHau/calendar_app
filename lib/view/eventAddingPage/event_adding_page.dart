@@ -101,11 +101,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                         ref.watch(todoDatabaseProvider.notifier);
                     todoProvider.writeData(data);
 
-                    final saveProvider = ref.watch(eventStateProvider.notifier);
-                    saveProvider.readDataMap();
-
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const CalendarPage()));
+                    Navigator.popUntil(context, ModalRoute.withName("/"));
                   },
             style: ButtonStyle(
                 backgroundColor:

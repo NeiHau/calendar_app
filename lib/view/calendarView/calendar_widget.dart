@@ -1,6 +1,5 @@
 import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/view/calendarView/calendar_list.dart';
-import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -367,10 +366,10 @@ class CalendarState extends ConsumerState<Calendar> {
       ref.read(foucusedDayProvider.notifier).state = selectedDate;
     });
 
-    if (!mounted) return;
+    // if (!mounted) return;
 
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => CalendarPage()));
+    // Navigator.of(context).pushReplacement(
+    //     MaterialPageRoute(builder: (context) => CalendarPage()));
   }
 
   // 日付をタップした際に表示させる予定追加画面のメソッド。

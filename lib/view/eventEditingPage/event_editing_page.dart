@@ -93,11 +93,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
               final todoProvider = ref.watch(todoDatabaseProvider.notifier);
               todoProvider.updateData(data);
 
-              // 更新されたデータをMap型に変換して保存
-              final saveProvider = ref.watch(eventStateProvider.notifier);
-              saveProvider.readDataMap();
-
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.popUntil(context, ModalRoute.withName("/"));
             },
             style: ButtonStyle(
                 backgroundColor:
@@ -277,14 +273,8 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                     ref.watch(todoDatabaseProvider.notifier);
                                 todoProvider.deleteData(data);
 
-                                final deleteProvider =
-                                    ref.watch(eventStateProvider.notifier);
-                                deleteProvider.readDataMap();
-
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const CalendarPage()));
+                                Navigator.popUntil(
+                                    context, ModalRoute.withName("/"));
                               },
                               child: const Text('削除'),
                             ),
