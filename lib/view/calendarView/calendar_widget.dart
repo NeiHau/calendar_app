@@ -10,8 +10,7 @@ final foucusedDayProvider = StateProvider(((ref) => DateTime.now()));
 
 class Calendar extends ConsumerStatefulWidget {
   const Calendar(
-      {required this.eventList,
-      required this.calendarController,
+      {required this.calendarController,
       this.color,
       this.now,
       this.weekDay,
@@ -22,8 +21,6 @@ class Calendar extends ConsumerStatefulWidget {
   final DateTime? now;
   final DateTime? weekDay;
   final PageController calendarController;
-
-  final List<Widget> eventList;
 
   @override
   ConsumerState<Calendar> createState() => CalendarState();
@@ -146,6 +143,7 @@ class CalendarState extends ConsumerState<Calendar> {
 
   // カレンダーの日にちを作成するメソッド
   Widget calendar(WidgetRef ref) {
+    final dataMap = ref.watch(eventStateProvider).todoItemsMap;
     List<Widget> list = []; // カレンダーの日数全てを含むリスト。1日〜月の最終日まで。
 
     // 月の最初の日。
@@ -176,7 +174,8 @@ class CalendarState extends ConsumerState<Calendar> {
                   DateTime(
                       firstDayOfTheMonth.year, firstDayOfTheMonth.month, i),
                   ref),
-              (widget.eventList.isNotEmpty) // 予定が追加されたら点を表示させる。
+              (dataMap.containsKey(DateTime(firstDayOfTheMonth.year,
+                      firstDayOfTheMonth.month, i))) // 予定が追加されたら点を表示させる。
                   ? const Icon(Icons.brightness_1, color: Colors.black, size: 6)
                   : const SizedBox(height: 0, width: 0),
             ],
@@ -355,21 +354,15 @@ class CalendarState extends ConsumerState<Calendar> {
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
         context: context,
-        initialDate: ref.read(foucusedDayProvider),
+        initialDate: ref.read(foucusedDayProvider.notifier).state,
         firstDate: DateTime(1970, 1, 1),
         lastDate: DateTime(DateTime.now().year + 100),
         locale: localeObj);
 
     if (selectedDate == null) return;
 
-    setState(() {
-      ref.read(foucusedDayProvider.notifier).state = selectedDate;
-    });
-
-    // if (!mounted) return;
-
-    // Navigator.of(context).pushReplacement(
-    //     MaterialPageRoute(builder: (context) => CalendarPage()));
+    ref.read(foucusedDayProvider.notifier).state = selectedDate;
+    print(ref.read(foucusedDayProvider.notifier).state);
   }
 
   // 日付をタップした際に表示させる予定追加画面のメソッド。

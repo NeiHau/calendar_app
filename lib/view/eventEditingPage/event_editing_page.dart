@@ -1,6 +1,5 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
 import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/cupertino.dart';

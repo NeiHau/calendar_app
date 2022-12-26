@@ -1,13 +1,15 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/model/freezed/event_state_data.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final eventStateProvider =
     StateNotifierProvider<EventStateNotifier, TodoStateData>((ref) {
   return EventStateNotifier(ref);
 });
 
+// データベースに追加されたデータをMap型のリストに代入して返すクラス。
 class EventStateNotifier extends StateNotifier<TodoStateData> {
   EventStateNotifier(this.ref) : super(TodoStateData());
 
@@ -19,7 +21,7 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
     final eventsAll = await database.readAllTodoData(); // 全てのデータを取得
 
     state = state.copyWith(todoItemsMap: {});
-    final Map<DateTime, List<Event>> dataMap = {};
+    final Map<DateTime, List<Event>> dataMap = {}; // 最初はリストは空。
 
     final todoList = List.generate(
         eventsAll.length,
@@ -35,6 +37,7 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
       // 開始日
       final startDay =
           DateTime(e.startDate.year, e.startDate.month, e.startDate.day);
+
       // 終了日
       final endDay = DateTime(e.endDate.year, e.endDate.month, e.endDate.day);
 
@@ -44,6 +47,7 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
         final date =
             DateTime(e.startDate.year, e.startDate.month, e.startDate.day + i);
 
+        // 追加された日にちはMap型に落とし込む。
         if (state.todoItemsMap[date] == null) {
           dataMap[date] = [e];
           state = state.copyWith(todoItemsMap: dataMap);

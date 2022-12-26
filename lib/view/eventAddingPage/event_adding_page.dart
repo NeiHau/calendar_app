@@ -1,8 +1,6 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
-import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
-import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -96,6 +94,8 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                       endDate: temp.endDate,
                       shujitsuBool: temp.isAllDay,
                     );
+
+                    //print(data);
                     // 'todoprovider'でProviderのメソッドや値を取得。
                     final todoProvider =
                         ref.watch(todoDatabaseProvider.notifier);
@@ -117,8 +117,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
             padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
             child: TextFormField(
               onChanged: (value) {
-                temp = temp.copyWith(title: value);
-                setState(() {});
+                setState(() {
+                  temp = temp.copyWith(title: value);
+                });
               },
               style:
                   const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
@@ -156,11 +157,11 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     widget.currentDate.hour,
                   ),
                   onDateTimeChanged: (value) {
-                    temp = temp.copyWith(startDate: value);
                     setState(() {
                       startDate = value;
                       print(startDate);
                     });
+                    temp = temp.copyWith(startDate: value);
                   },
                   use24hFormat: true,
                   mode: isAllDay
@@ -187,10 +188,10 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     endDate.hour,
                   ),
                   onDateTimeChanged: (value) {
-                    temp = temp.copyWith(endDate: value);
                     setState(() {
                       endDate = value;
                     });
+                    temp = temp.copyWith(endDate: value);
                   },
                   use24hFormat: true,
                   mode: isAllDay
@@ -226,8 +227,9 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
         padding: const EdgeInsets.fromLTRB(10, 7, 5, 5),
         child: TextFormField(
           onChanged: (value) {
-            temp = temp.copyWith(description: value);
-            setState(() {});
+            setState(() {
+              temp = temp.copyWith(description: value);
+            });
           },
           style: const TextStyle(fontSize: 12),
           decoration: const InputDecoration(
@@ -269,7 +271,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                             onPressed: () {
                               final isEndTimeBefore =
                                   endDate.isBefore(startDate);
-
                               final isEqual = endDate.microsecondsSinceEpoch ==
                                   startDate.millisecondsSinceEpoch;
 

@@ -8,6 +8,7 @@ part 'event_state_data.freezed.dart';
 class TodoStateData with _$TodoStateData {
   // データベースの状態を管理するクラス。
   factory TodoStateData({
+    ///Map<日付:イベント>
     @Default({}) Map<DateTime, List<Event>> todoItemsMap,
     //const factory @Default(true) Assert
   }) = _TodoStateData;

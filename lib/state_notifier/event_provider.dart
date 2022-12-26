@@ -13,7 +13,7 @@ final todoDatabaseProvider =
   return TodoDatabaseNotifier(ref);
 });
 
-// データベースの状態が変わるたびTodoのviewをビルドするようにするクラス。
+// データベースの状態が変わるたびTodoListのviewをビルドするクラス。
 class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   TodoDatabaseNotifier(this.ref) : super(TodoEventList());
 
@@ -21,7 +21,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   final _db = MyDatabase();
 
   // 書き込み処理部分
-  Future writeData(TodoItemData data) async {
+  Future<void> writeData(TodoItemData data) async {
     if (data.title.isEmpty) {
       return;
     }
@@ -42,7 +42,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   }
 
   // 削除処理部分
-  Future deleteData(Event data) async {
+  Future<void> deleteData(Event data) async {
     await _db.deleteTodo(data);
 
     // 削除するたびにデータベースを読み込んで、マップ型に落とし込む。
@@ -51,7 +51,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   }
 
   // 更新処理部分
-  Future updateData(TodoItemData data) async {
+  Future<void> updateData(TodoItemData data) async {
     if (data.title.isEmpty) {
       return;
     }
@@ -63,7 +63,7 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   }
 
   // データ読み込み処理
-  Future readData() async {
+  Future<void> readData() async {
     final todoItems = await _db.readAllTodoData();
 
     List<Event> todoList = [];
