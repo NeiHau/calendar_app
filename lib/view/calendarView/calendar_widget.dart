@@ -206,13 +206,18 @@ class CalendarState extends ConsumerState<Calendar> {
           } else {
             listCache.add(
               Expanded(
-                  child: buildCalendarItem(
-                      nextMonthFirstNumber + j,
-                      DateTime(
-                          firstDayOfTheMonth.year,
-                          firstDayOfTheMonth.month + 1,
-                          nextMonthFirstNumber + j),
-                      ref)),
+                child: Column(
+                  children: [
+                    buildCalendarItem(
+                        nextMonthFirstNumber + j,
+                        DateTime(
+                            firstDayOfTheMonth.year,
+                            firstDayOfTheMonth.month + 1,
+                            nextMonthFirstNumber + j),
+                        ref),
+                  ],
+                ),
+              ),
             );
           }
         }

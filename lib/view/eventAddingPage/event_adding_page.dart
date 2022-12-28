@@ -7,9 +7,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-final startDayProvider = StateProvider((ref) => DateTime.now());
-final finishDayProvider = StateProvider((ref) => DateTime.now());
-
 class EventAddingPage extends ConsumerStatefulWidget {
   const EventAddingPage({
     super.key,
@@ -29,7 +26,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   final titleController = TextEditingController();
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
-  late FocusNode addTaskFocusNode;
   bool isAllDay = false;
   static var uuid = const Uuid(); // idを取得
   Event temp = Event(
@@ -132,7 +128,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
       );
 
   // 開始日、終了日を入力するためのメソッド。
-  Card selectShujitsuDay() {
+  Widget selectShujitsuDay() {
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -157,11 +153,13 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     widget.currentDate.hour,
                   ),
                   onDateTimeChanged: (value) {
+                    temp = temp.copyWith(startDate: value);
                     setState(() {
                       startDate = value;
                       print(startDate);
+                      print(endDate);
                     });
-                    temp = temp.copyWith(startDate: value);
+                    print(temp);
                   },
                   use24hFormat: true,
                   mode: isAllDay
@@ -188,10 +186,12 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     endDate.hour,
                   ),
                   onDateTimeChanged: (value) {
+                    temp = temp.copyWith(endDate: value);
                     setState(() {
                       endDate = value;
+                      print(endDate);
                     });
-                    temp = temp.copyWith(endDate: value);
+                    print(temp);
                   },
                   use24hFormat: true,
                   mode: isAllDay
@@ -275,16 +275,21 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                                   startDate.millisecondsSinceEpoch;
 
                               if (isAllDay) {
-                                if (isEndTimeBefore || isEqual) {
+                                if (isEndTimeBefore) {
+                                  temp = temp.copyWith(endDate: startDate);
                                   setState(() {
                                     endDate = startDate;
                                   });
                                 }
                               } else {
                                 if (isEndTimeBefore || isEqual) {
+                                  temp = temp.copyWith(
+                                      endDate: startDate
+                                          .add(const Duration(hours: 1)));
                                   setState(() {
                                     endDate =
                                         startDate.add(const Duration(hours: 1));
+                                    //print(endDate);
                                   });
                                 }
                               }

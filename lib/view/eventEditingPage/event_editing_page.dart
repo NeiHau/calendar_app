@@ -1,17 +1,11 @@
 import 'package:first_app/model/database/todo_item_data.dart';
 import 'package:first_app/model/freezed/event.dart';
 import 'package:first_app/state_notifier/event_provider.dart';
-import 'package:first_app/view/calendarView/calendar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-
-// 開始日
-final startDayProvider = StateProvider((ref) => DateTime.now());
-// 終了日
-final finishDayProvider = StateProvider((ref) => DateTime.now());
 
 class EventEditingPage extends ConsumerStatefulWidget {
   const EventEditingPage({super.key, required this.arguments});
@@ -28,7 +22,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
   final titleController = TextEditingController();
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
-  late FocusNode addTaskFocusNode;
   bool isAllDay = false;
   static var uuid = const Uuid(); // idを取得
   late Event temp;
@@ -181,6 +174,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     temp = temp.copyWith(endDate: value);
                     setState(() {
                       endDate = value;
+                      //print(endDate);
                     });
                   },
                   use24hFormat: true,
@@ -325,7 +319,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                             onPressed: () {
                               final isEndTimeBefore =
                                   temp.endDate.isBefore(temp.startDate);
-
                               final isEqual =
                                   temp.endDate.microsecondsSinceEpoch ==
                                       temp.startDate.millisecondsSinceEpoch;
@@ -346,10 +339,7 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                                   });
                                 }
                               }
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CalendarPage()));
+                              Navigator.pop(context);
                             },
                             child: const Text('完了'))
                       ],

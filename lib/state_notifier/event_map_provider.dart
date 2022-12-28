@@ -17,7 +17,7 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
   MyDatabase database = MyDatabase();
 
   // このメソッド内で、取得したデータをMap型の変数に格納して扱う。
-  Future readDataMap() async {
+  Future<void> readDataMap() async {
     final eventsAll = await database.readAllTodoData(); // 全てのデータを取得
 
     state = state.copyWith(todoItemsMap: {});
@@ -47,7 +47,7 @@ class EventStateNotifier extends StateNotifier<TodoStateData> {
         final date =
             DateTime(e.startDate.year, e.startDate.month, e.startDate.day + i);
 
-        // 追加された日にちはMap型に落とし込む。
+        // 追加された日にちをMap型に落とし込む。
         if (state.todoItemsMap[date] == null) {
           dataMap[date] = [e];
           state = state.copyWith(todoItemsMap: dataMap);

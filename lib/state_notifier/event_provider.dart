@@ -5,9 +5,6 @@ import 'package:first_app/state_notifier/event_map_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:drift/drift.dart';
 
-final startDateProvider = StateProvider(((ref) => DateTime.now()));
-final endDateProvider = StateProvider(((ref) => DateTime.now));
-
 final todoDatabaseProvider =
     StateNotifierProvider<TodoDatabaseNotifier, TodoEventList>((ref) {
   return TodoDatabaseNotifier(ref);
@@ -22,9 +19,6 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
 
   // 書き込み処理部分
   Future<void> writeData(TodoItemData data) async {
-    if (data.title.isEmpty) {
-      return;
-    }
     TodoItemCompanion entry = TodoItemCompanion(
       id: Value(data.id),
       title: Value(data.title),
@@ -45,16 +39,12 @@ class TodoDatabaseNotifier extends StateNotifier<TodoEventList> {
   Future<void> deleteData(Event data) async {
     await _db.deleteTodo(data);
 
-    // 削除するたびにデータベースを読み込んで、マップ型に落とし込む。
     readData();
     ref.read(eventStateProvider.notifier).readDataMap();
   }
 
   // 更新処理部分
   Future<void> updateData(TodoItemData data) async {
-    if (data.title.isEmpty) {
-      return;
-    }
     await _db.updateTodo(data);
 
     // 更新するたびにデータベースを読み込む。
