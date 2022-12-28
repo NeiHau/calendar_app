@@ -38,10 +38,10 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
 
   @override
   void initState() {
-    if (widget.event == null) {
-      startDate = widget.currentDate;
-      endDate = startDate.add(const Duration(hours: 2));
-    }
+    startDate = widget.currentDate;
+    endDate = startDate.add(const Duration(hours: 2));
+    temp = temp.copyWith(startDate: widget.currentDate, endDate: startDate);
+
     super.initState();
   }
 
@@ -98,6 +98,8 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     todoProvider.writeData(data);
 
                     Navigator.popUntil(context, ModalRoute.withName("/"));
+
+                    print(data);
                   },
             style: ButtonStyle(
                 backgroundColor:
@@ -147,19 +149,16 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
               onPressed: () {
                 cupertinoDatePicker(CupertinoDatePicker(
                   initialDateTime: DateTime(
-                    widget.currentDate.year,
-                    widget.currentDate.month,
-                    widget.currentDate.day,
-                    widget.currentDate.hour,
+                    startDate.year,
+                    startDate.month,
+                    startDate.day,
+                    startDate.hour,
                   ),
                   onDateTimeChanged: (value) {
                     temp = temp.copyWith(startDate: value);
                     setState(() {
                       startDate = value;
-                      print(startDate);
-                      print(endDate);
                     });
-                    print(temp);
                   },
                   use24hFormat: true,
                   mode: isAllDay
@@ -189,9 +188,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     temp = temp.copyWith(endDate: value);
                     setState(() {
                       endDate = value;
-                      print(endDate);
                     });
-                    print(temp);
                   },
                   use24hFormat: true,
                   mode: isAllDay
@@ -275,21 +272,20 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                                   startDate.millisecondsSinceEpoch;
 
                               if (isAllDay) {
-                                if (isEndTimeBefore) {
-                                  temp = temp.copyWith(endDate: startDate);
+                                if (isEndTimeBefore || isEqual) {
                                   setState(() {
                                     endDate = startDate;
+                                    temp = temp.copyWith(endDate: startDate);
                                   });
                                 }
                               } else {
                                 if (isEndTimeBefore || isEqual) {
-                                  temp = temp.copyWith(
-                                      endDate: startDate
-                                          .add(const Duration(hours: 1)));
                                   setState(() {
+                                    temp = temp.copyWith(
+                                        endDate: startDate
+                                            .add(const Duration(hours: 1)));
                                     endDate =
                                         startDate.add(const Duration(hours: 1));
-                                    //print(endDate);
                                   });
                                 }
                               }

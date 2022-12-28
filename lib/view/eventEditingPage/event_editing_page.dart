@@ -174,7 +174,6 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
                     temp = temp.copyWith(endDate: value);
                     setState(() {
                       endDate = value;
-                      //print(endDate);
                     });
                   },
                   use24hFormat: true,

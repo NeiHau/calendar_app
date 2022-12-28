@@ -195,13 +195,25 @@ class CalendarState extends ConsumerState<Calendar> {
             listCache.insert(
               0,
               Expanded(
-                  child: buildCalendarItem(
-                      previousMonthLastNumber - j,
-                      DateTime(
-                          firstDayOfTheMonth.year,
-                          firstDayOfTheMonth.month - 1,
-                          previousMonthLastNumber - j),
-                      ref)),
+                child: Column(
+                  children: [
+                    buildCalendarItem(
+                        previousMonthLastNumber - j,
+                        DateTime(
+                            firstDayOfTheMonth.year,
+                            firstDayOfTheMonth.month - 1,
+                            previousMonthLastNumber - j),
+                        ref),
+                    (dataMap.containsKey(DateTime(
+                            firstDayOfTheMonth.year,
+                            firstDayOfTheMonth.month - 1,
+                            previousMonthLastNumber - j))) // 予定が追加されたら点を表示させる。
+                        ? const Icon(Icons.brightness_1,
+                            color: Colors.black, size: 6)
+                        : const SizedBox(height: 0, width: 0)
+                  ],
+                ),
+              ),
             );
           } else {
             listCache.add(

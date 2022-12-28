@@ -11,7 +11,6 @@ class CalendarPage extends ConsumerStatefulWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage> {
   DateTime now = DateTime.now();
-  //final DateTime now = ref.read(foucusedDayProvider.notifier).state;
   late final PageController calendarController;
   int initialPage = 0;
   final DateTime firstDay = DateTime(1970, 1, 1);
@@ -43,7 +42,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                   final distance = initialPage - value;
                   return DateTime(now.year, now.month - distance);
                 });
-                print(ref.read(foucusedDayProvider.notifier).state);
+                // print(ref.read(foucusedDayProvider.notifier).state);
               },
             ),
           ),
