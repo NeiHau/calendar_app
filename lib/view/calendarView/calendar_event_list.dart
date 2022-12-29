@@ -38,7 +38,6 @@ class CalendarEventList extends ConsumerWidget {
   List<Widget> buildTodoList(BuildContext context, List<Event> currentEvents) {
     // currentEvents != null 入っているイベントをリストで表示
     for (Event item in currentEvents) {
-      //print(currentEvents);
       Widget tile = Container(
         decoration: BoxDecoration(
             border: Border(
@@ -74,13 +73,17 @@ class CalendarEventList extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(
-                  width: 12,
+                  width: 10,
                 ),
                 Title(
                   color: Colors.black,
-                  child: Text(
-                    item.title,
-                    textAlign: TextAlign.center,
+                  child: Flexible(
+                    child: Text(
+                      item.title,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                    ),
                   ),
                 ),
               ],

@@ -98,8 +98,6 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                     todoProvider.writeData(data);
 
                     Navigator.popUntil(context, ModalRoute.withName("/"));
-
-                    print(data);
                   },
             style: ButtonStyle(
                 backgroundColor:
@@ -119,8 +117,10 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
                   temp = temp.copyWith(title: value);
                 });
               },
-              style:
-                  const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  overflow: TextOverflow.ellipsis),
               decoration: const InputDecoration(
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,

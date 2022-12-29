@@ -104,7 +104,10 @@ class EventEditingPageState extends ConsumerState<EventEditingPage> {
             onChanged: (value) {
               temp = temp.copyWith(title: value);
             },
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                overflow: TextOverflow.ellipsis),
             decoration: const InputDecoration(
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
