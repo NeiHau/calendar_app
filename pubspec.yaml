@@ -32,9 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   build_runner:
-  table_calendar: ^3.0.8
   intl: ^0.17.0
-  syncfusion_flutter_calendar: ^20.3.52
   provider: ^6.0.4
   freezed: ^2.2.1
   freezed_annotation: ^2.2.0

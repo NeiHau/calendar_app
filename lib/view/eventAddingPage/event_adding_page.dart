@@ -40,7 +40,7 @@ class EventAddingPageState extends ConsumerState<EventAddingPage> {
   void initState() {
     startDate = widget.currentDate;
     endDate = startDate.add(const Duration(hours: 2));
-    temp = temp.copyWith(startDate: widget.currentDate, endDate: startDate);
+    temp = temp.copyWith(startDate: startDate, endDate: endDate);
 
     super.initState();
   }

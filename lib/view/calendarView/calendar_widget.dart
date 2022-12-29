@@ -50,7 +50,7 @@ class CalendarState extends ConsumerState<Calendar> {
       children: [
         currentMonth(ref),
         dayOfWeek(ref),
-        Expanded(child: calendar(ref)),
+        Expanded(child: createCalendar(ref)),
       ],
     );
   }
@@ -142,7 +142,7 @@ class CalendarState extends ConsumerState<Calendar> {
   }
 
   // カレンダーの日にちを作成するメソッド
-  Widget calendar(WidgetRef ref) {
+  Widget createCalendar(WidgetRef ref) {
     final dataMap = ref.watch(eventStateProvider).todoItemsMap;
     List<Widget> list = []; // カレンダーの日数全てを含むリスト。1日〜月の最終日まで。
 
@@ -227,6 +227,13 @@ class CalendarState extends ConsumerState<Calendar> {
                             firstDayOfTheMonth.month + 1,
                             nextMonthFirstNumber + j),
                         ref),
+                    (dataMap.containsKey(DateTime(
+                            firstDayOfTheMonth.year,
+                            firstDayOfTheMonth.month + 1,
+                            nextMonthFirstNumber + j))) // 予定が追加されたら点を表示させる。
+                        ? const Icon(Icons.brightness_1,
+                            color: Colors.black, size: 6)
+                        : const SizedBox(height: 0, width: 0),
                   ],
                 ),
               ),
@@ -257,7 +264,7 @@ class CalendarState extends ConsumerState<Calendar> {
     final focusedDay = ref.read(foucusedDayProvider);
     final date = DateTime.now();
     final today = DateTime(date.year, date.month, date.day);
-    bool isToday = cacheDate == today;
+    bool isToday = cacheDate == today && focusedDay.month == cacheDate.month;
     bool isOutsideDay = (focusedDay.month != cacheDate.month);
 
     if (isToday) {
@@ -370,16 +377,34 @@ class CalendarState extends ConsumerState<Calendar> {
   Future<void> selectDate(String? locale) async {
     final localeObj = locale != null ? Locale(locale) : null;
     final selectedDate = await showMonthYearPicker(
-        context: context,
-        initialDate: ref.read(foucusedDayProvider.notifier).state,
-        firstDate: DateTime(1970, 1, 1),
-        lastDate: DateTime(DateTime.now().year + 100),
-        locale: localeObj);
+      context: context,
+      initialDate: ref.read(foucusedDayProvider.notifier).state,
+      firstDate: DateTime(1970, 1, 1),
+      lastDate: DateTime(DateTime.now().year + 100),
+      locale: localeObj,
+      initialMonthYearPickerMode: MonthYearPickerMode.month,
+      builder: (context, child) {
+        return Center(
+          child: Expanded(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 1.1,
+              height: MediaQuery.of(context).size.height * 0.75,
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
 
     if (selectedDate == null) return;
 
-    ref.read(foucusedDayProvider.notifier).state = selectedDate;
-    print(ref.read(foucusedDayProvider.notifier).state);
+    // 選択した日付がカレンダーの何ページ目にあるか
+    final initialPageCount = (selectedDate.year - firstDay.year) * 12 +
+        selectedDate.month -
+        firstDay.month;
+    // 表示したいページをcalendarControllerに指示
+    widget.calendarController.animateToPage(initialPageCount,
+        duration: const Duration(milliseconds: 2), curve: Curves.ease);
   }
 
   // 日付をタップした際に表示させる予定追加画面のメソッド。
